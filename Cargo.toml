@@ -1,0 +1,12 @@
+[package]
+name = "plygui-test"
+version = "0.1.0"
+authors = ["snuk182 <snuk188@gmail.com>"]
+
+[[bin]]
+name = "uitest"
+path = "src/main.rs"
+
+[dependencies]
+plygui = {version = "0.0.1", path = "../plygui"}
+plygui-win32 = {version = "0.0.1", path = "../plygui-win32"}
