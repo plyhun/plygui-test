@@ -34,7 +34,7 @@ fn main() {
 	button.on_left_click(Some(Box::new(move |b| {
 		println!("button clicked: {} / {:?}", b.label(), b.id());
 		//b.set_visibility(Visibility::Gone);
-		{
+		/*{
 			let parent = b.parent().unwrap();
 			println!("parent is {:?}", parent.role());
 			println!("clicked is {:?}", parent.find_control_by_id(b.id()).unwrap().role());
@@ -43,7 +43,7 @@ fn main() {
 		println!("root is {:?}", root.role());
 		
 		let butt1 = root.find_control_by_id_mut(butt1_id).unwrap();
-		butt1.set_visibility(Visibility::Visible);
+		butt1.set_visibility(Visibility::Visible);*/
 	})));
 	button.on_resize(Some(Box::new(|_, w, h| {
 		println!("button resized too to {}/{}", w, h);
