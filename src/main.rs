@@ -18,6 +18,7 @@ fn main() {
 	//button.set_layout_params(layout::Params::WrapContent, layout::Params::MatchParent);
 	button.on_left_click(Some(Box::new(|b| {
 		println!("button clicked: {}", b.label());
+		//b.set_visibility(Visibility::Gone);
 		b.set_visibility(Visibility::Invisible);
 	})));
 	button.on_resize(Some(Box::new(|_, w, h| {
@@ -33,17 +34,43 @@ fn main() {
 	//button.set_layout_params(layout::Params::WrapContent, layout::Params::MatchParent);
 	button.on_left_click(Some(Box::new(move |b| {
 		println!("button clicked: {} / {:?}", b.label(), b.id());
-		//b.set_visibility(Visibility::Gone);
-		/*{
+		{
 			let parent = b.parent().unwrap();
-			println!("parent is {:?}", parent.role());
-			println!("clicked is {:?}", parent.find_control_by_id(b.id()).unwrap().role());
+			let parent_member_id = parent.member_id();
+			println!("parent is {:?}", parent_member_id);
+			
+			let parent: &UiContainer = match parent_member_id {
+				members::MEMBER_ID_WINDOW => unsafe { 
+					let parent: &Window = ::std::mem::transmute(parent); 
+					parent
+				},
+				members::MEMBER_ID_LAYOUT_LINEAR => unsafe { 
+					let parent: &LinearLayout = ::std::mem::transmute(parent); 
+					parent
+				},
+				_ => unreachable!(),
+			};
+			
+			println!("clicked is {:?}", parent.find_control_by_id(b.id()).unwrap().member_id());
 		}
 		let root = b.root_mut().unwrap();
-		println!("root is {:?}", root.role());
+		let root_member_id = root.member_id();
+		println!("root is {:?}", root_member_id);
+		
+		let root: &mut UiContainer = match root_member_id {
+			members::MEMBER_ID_WINDOW => unsafe { 
+				let root: &mut Window = ::std::mem::transmute(root); 
+				root
+			},
+			members::MEMBER_ID_LAYOUT_LINEAR => unsafe { 
+				let root: &mut LinearLayout = ::std::mem::transmute(root); 
+				root
+			},
+			_ => unreachable!(),
+		};
 		
 		let butt1 = root.find_control_by_id_mut(butt1_id).unwrap();
-		butt1.set_visibility(Visibility::Visible);*/
+		butt1.set_visibility(Visibility::Visible);
 	})));
 	button.on_resize(Some(Box::new(|_, w, h| {
 		println!("button resized too to {}/{}", w, h);
