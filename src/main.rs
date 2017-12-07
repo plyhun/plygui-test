@@ -40,12 +40,12 @@ fn main() {
 			println!("parent is {:?}", parent_member_id);
 			
 			let parent: &UiContainer = match parent_member_id {
-				members::MEMBER_ID_WINDOW => unsafe { 
-					let parent: &Window = ::std::mem::transmute(parent); 
+				members::MEMBER_ID_WINDOW => { 
+					let parent: &Window = utils::common_to_impl(parent); 
 					parent
 				},
-				members::MEMBER_ID_LAYOUT_LINEAR => unsafe { 
-					let parent: &LinearLayout = ::std::mem::transmute(parent); 
+				members::MEMBER_ID_LAYOUT_LINEAR => { 
+					let parent: &LinearLayout = utils::common_to_impl(parent); 
 					parent
 				},
 				_ => unreachable!(),
