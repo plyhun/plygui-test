@@ -7,7 +7,7 @@ use plygui_win32::*;
 fn main() {
 	let mut application = Application::with_name("Plygui test");
 	
-	let mut window = application.new_window("plygui!!", 1280, 800, false);
+	let mut window = application.new_window("plygui!!", 400, 200, false);
 	
 	window.on_resize(Some(Box::new(|_, w, h| {
 		println!("win resized to {}/{}", w, h);
@@ -18,8 +18,8 @@ fn main() {
 	//button.set_layout_params(layout::Params::WrapContent, layout::Params::MatchParent);
 	button.on_left_click(Some(Box::new(|b| {
 		println!("button clicked: {}", b.label());
-		//b.set_visibility(Visibility::Gone);
-		b.set_visibility(Visibility::Invisible);
+		b.set_visibility(Visibility::Gone);
+		//b.set_visibility(Visibility::Invisible);
 	})));
 	button.on_resize(Some(Box::new(|_, w, h| {
 		println!("button resized too to {}/{}", w, h);
@@ -58,12 +58,12 @@ fn main() {
 		println!("root is {:?}", root_member_id);
 		
 		let root: &mut UiContainer = match root_member_id {
-			members::MEMBER_ID_WINDOW => unsafe { 
-				let root: &mut Window = ::std::mem::transmute(root); 
+			members::MEMBER_ID_WINDOW => { 
+				let root: &mut Window = utils::common_to_impl_mut(root); 
 				root
 			},
-			members::MEMBER_ID_LAYOUT_LINEAR => unsafe { 
-				let root: &mut LinearLayout = ::std::mem::transmute(root); 
+			members::MEMBER_ID_LAYOUT_LINEAR => { 
+				let root: &mut LinearLayout = utils::common_to_impl_mut(root); 
 				root
 			},
 			_ => unreachable!(),
