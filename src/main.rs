@@ -1,8 +1,6 @@
 extern crate plygui;
-extern crate plygui_win32;
 
 use plygui::*;
-use plygui_win32::*;
 
 fn main() {
 	let mut application = Application::with_name("Plygui test");
