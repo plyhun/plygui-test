@@ -7,31 +7,31 @@ fn main() {
 	
 	let mut window = application.new_window("plygui!!", WindowStartSize::Exact(200, 200), false);
 	
-	window.on_resize(Some(Box::new(|_, w, h| {
+	window.on_resize(Some((|_: &mut UiMember, w: u16, h: u16| {
 		println!("win resized to {}/{}", w, h);
-	})));
+	}).into()));
 	
 	let mut button = Button::new("Butt1");
-	let butt1_id = button.id();
+	let butt1_id = button.as_base().id();
 	//button.set_layout_params(layout::Params::WrapContent, layout::Params::MatchParent);
-	button.on_left_click(Some(Box::new(|b| {
+	button.on_left_click(Some((|b: &mut UiButton| {
 		println!("button clicked: {}", b.label());
 		b.set_visibility(Visibility::Gone);
 		//b.set_visibility(Visibility::Invisible);
-	})));
-	button.on_resize(Some(Box::new(|_, w, h| {
+	}).into()));
+	button.on_resize(Some((|_: &mut UiMember, w: u16, h: u16| {
 		println!("button resized too to {}/{}", w, h);
-	})));
+	}).into()));
 	let mut vb = LinearLayout::new(layout::Orientation::Vertical);
-	vb.on_resize(Some(Box::new(|_,w,h| {
+	vb.on_resize(Some((|_: &mut UiMember, w: u16, h: u16| {
 		println!("wb resized to {}/{}", w, h);
-	})));
+	}).into()));
 	vb.push_child(button);
 	
 	let mut button = Button::new("Butt2");
 	//button.set_layout_params(layout::Params::WrapContent, layout::Params::MatchParent);
-	button.on_left_click(Some(Box::new(move |b| {
-		println!("button clicked: {} / {:?}", b.label(), b.id());
+	button.on_left_click(Some((move |b: &mut UiButton| {
+		println!("button clicked: {} / {:?}", b.label(), b.as_base().id());
 		{
 			let parent = b.parent().unwrap();
 			let parent_member_id = parent.member_id();
@@ -49,7 +49,7 @@ fn main() {
 				_ => unreachable!(),
 			};
 			
-			println!("clicked is {:?}", parent.find_control_by_id(b.id()).unwrap().member_id());
+			println!("clicked is {:?}", parent.find_control_by_id(b.as_base().id()).unwrap().as_base().member_id());
 		}
 		let root = b.root_mut().unwrap();
 		let root_member_id = root.member_id();
@@ -69,10 +69,10 @@ fn main() {
 		
 		let butt1 = root.find_control_by_id_mut(butt1_id).unwrap();
 		butt1.set_visibility(Visibility::Visible);
-	})));
-	button.on_resize(Some(Box::new(|_, w, h| {
+	}).into()));
+	button.on_resize(Some((|_: &mut UiMember, w: u16, h: u16| {
 		println!("button resized too to {}/{}", w, h);
-	})));
+	}).into()));
 	vb.push_child(button);
 	
 	window.set_child(Some(vb));
