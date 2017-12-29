@@ -11,6 +11,17 @@ fn main() {
 		println!("win resized to {}/{}", w, h);
 	}).into()));
 	
+	let mut vb = LinearLayout::new(layout::Orientation::Vertical);
+	vb.on_resize(Some((|_: &mut UiMember, w: u16, h: u16| {
+		println!("wb resized to {}/{}", w, h);
+	}).into()));
+	
+	/*let mut vbb = LinearLayout::new(layout::Orientation::Horizontal);
+	vbb.set_layout_params(layout::Params::WrapContent, layout::Params::MatchParent);
+	vbb.push_child(Button::new("Butt0"));
+	vbb.push_child(Button::new("Butt00"));
+	vb.push_child(vbb);*/
+	
 	let mut button = Button::new("Butt1");
 	let butt1_id = button.as_base().id();
 	//button.set_layout_params(layout::Params::WrapContent, layout::Params::MatchParent);
@@ -21,10 +32,6 @@ fn main() {
 	}).into()));
 	button.on_resize(Some((|_: &mut UiMember, w: u16, h: u16| {
 		println!("button resized too to {}/{}", w, h);
-	}).into()));
-	let mut vb = LinearLayout::new(layout::Orientation::Vertical);
-	vb.on_resize(Some((|_: &mut UiMember, w: u16, h: u16| {
-		println!("wb resized to {}/{}", w, h);
 	}).into()));
 	vb.push_child(button);
 	
