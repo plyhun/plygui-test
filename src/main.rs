@@ -16,11 +16,17 @@ fn main() {
 		println!("wb resized to {}/{}", w, h);
 	}).into()));
 	
-	/*let mut vbb = LinearLayout::new(layout::Orientation::Horizontal);
-	vbb.set_layout_params(layout::Params::WrapContent, layout::Params::MatchParent);
-	vbb.push_child(Button::new("Butt0"));
-	vbb.push_child(Button::new("Butt00"));
-	vb.push_child(vbb);*/
+	let mut vbb = LinearLayout::new(layout::Orientation::Horizontal);
+	let mut button = Button::new("Butt0");
+	button.set_layout_width(layout::Size::WrapContent);
+	button.set_layout_height(layout::Size::WrapContent);
+	vbb.push_child(button);
+	let mut button = Button::new("Butt00");
+	button.set_layout_width(layout::Size::WrapContent);
+	button.set_layout_height(layout::Size::WrapContent);
+	vbb.push_child(button);
+	
+	vb.push_child(vbb);
 	
 	let mut button = Button::new("Butt1");
 	let butt1_id = button.as_base().id();
