@@ -17,13 +17,18 @@ fn main() {
 	}).into()));
 	
 	let mut vbb = LinearLayout::new(layout::Orientation::Horizontal);
+	vbb.set_layout_padding(layout::BoundarySize::AllTheSame(5).into());
 	let mut button = Button::new("Butt0");
 	button.set_layout_width(layout::Size::WrapContent);
 	button.set_layout_height(layout::Size::WrapContent);
+	button.set_layout_padding(layout::BoundarySize::AllTheSame(5).into());
+	
 	vbb.push_child(button);
 	let mut button = Button::new("Butt00");
 	button.set_layout_width(layout::Size::WrapContent);
 	button.set_layout_height(layout::Size::WrapContent);
+	button.set_layout_padding(layout::BoundarySize::AllTheSame(5).into());
+	
 	vbb.push_child(button);
 	
 	vb.push_child(vbb);
@@ -31,7 +36,7 @@ fn main() {
 	let mut button = Button::new("Butt1");
 	let butt1_id = button.as_base().id();
 	//button.set_layout_params(layout::Params::WrapContent, layout::Params::MatchParent);
-	button.on_left_click(Some((|b: &mut UiButton| {
+	button.on_click(Some((|b: &mut UiButton| {
 		println!("button clicked: {}", b.label());
 		b.set_visibility(Visibility::Gone);
 		//b.set_visibility(Visibility::Invisible);
@@ -43,7 +48,7 @@ fn main() {
 	
 	let mut button = Button::new("Butt2");
 	//button.set_layout_params(layout::Params::WrapContent, layout::Params::MatchParent);
-	button.on_left_click(Some((move |b: &mut UiButton| {
+	button.on_click(Some((move |b: &mut UiButton| {
 		println!("button clicked: {} / {:?}", b.label(), b.as_base().id());
 		{
 			let parent = b.parent().unwrap();
@@ -71,6 +76,7 @@ fn main() {
 		let root: &mut UiContainer = match root_member_id {
 			members::MEMBER_ID_WINDOW => { 
 				let root: &mut Window = utils::common_to_impl_mut(root); 
+				println!("ROOT IS {}", root.label());
 				root
 			},
 			members::MEMBER_ID_LAYOUT_LINEAR => { 
