@@ -5,7 +5,7 @@ use plygui::*;
 fn main() {
     let mut application = Application::with_name("Plygui test");
 
-    let mut window = application.new_window("plygui!!", WindowStartSize::Exact(200, 200), false);
+    let mut window = application.new_window("plygui!!", WindowStartSize::Exact(200, 200), WindowMenu::None);
 
     window.on_resize(Some(
         (|_: &mut UiMember, w: u16, h: u16| {
