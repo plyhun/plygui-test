@@ -26,16 +26,18 @@ fn main() {
     button.set_layout_width(layout::Size::WrapContent);
     button.set_layout_height(layout::Size::WrapContent);
     button.set_layout_padding(layout::BoundarySize::AllTheSame(5).into());
-
     vbb.push_child(button);
+    
     let mut button = Button::new("Butt00");
     button.set_layout_width(layout::Size::WrapContent);
     button.set_layout_height(layout::Size::WrapContent);
     button.set_layout_padding(layout::BoundarySize::AllTheSame(5).into());
-
     vbb.push_child(button);
+    
+    let mut frame = Frame::new("Horizontal Frame");
+    frame.set_child(Some(vbb));
 
-    vb.push_child(vbb);
+    vb.push_child(frame);
 
     let mut button = Button::new("Butt1");
     let butt1_id = button.as_base().id();
