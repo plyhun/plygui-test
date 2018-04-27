@@ -13,7 +13,7 @@ fn main() {
          }).into(),
     ));
 
-    let mut vb = LinearLayout::new(layout::Orientation::Vertical);
+    /*let mut vb = LinearLayout::new(layout::Orientation::Vertical);
     vb.on_resize(Some(
         (|_: &mut UiMember, w: u16, h: u16| {
              println!("wb resized to {}/{}", w, h);
@@ -54,14 +54,14 @@ fn main() {
              println!("button resized too to {}/{}", w, h);
          }).into(),
     ));
-    vb.push_child(button);
+    vb.push_child(button);*/
 
-    let mut button = Button::new("Butt2");
+    let mut button = Button::with_label("Butt2");
     //button.set_layout_params(layout::Params::WrapContent, layout::Params::MatchParent);
     button.on_click(Some(
         (move |b: &mut UiButton| {
-            println!("button clicked: {} / {:?}", b.label(), b.as_base().id());
-            {
+            println!("button clicked: {} / {:?}", b.label(), b.as_control().id());
+           /* {
                 let parent = b.parent().unwrap();
                 let parent_member_id = parent.member_id();
                 println!("parent is {:?}", parent_member_id);
@@ -105,7 +105,7 @@ fn main() {
             };
 
             let butt1 = root.find_control_by_id_mut(butt1_id).unwrap();
-            butt1.set_visibility(Visibility::Visible);
+            butt1.set_visibility(Visibility::Visible);*/
         }).into(),
     ));
     button.on_resize(Some(
@@ -113,11 +113,11 @@ fn main() {
              println!("button resized too to {}/{}", w, h);
          }).into(),
     ));
-    vb.push_child(button);
+    //vb.push_child(button);
 
-    window.set_child(Some(vb));
+    //window.set_child(Some(vb));
 
-    //window.set_child(Some(button));
+    window.set_child(Some(button.into_control()));
 
     application.start();
 }
