@@ -1,3 +1,5 @@
+#![feature(get_type_id)]
+
 extern crate plygui;
 
 use plygui::*;
@@ -13,34 +15,35 @@ fn main() {
          }).into(),
     ));
 
-    /*let mut vb = LinearLayout::new(layout::Orientation::Vertical);
+    let mut vb = LinearLayout::with_orientation(layout::Orientation::Vertical);
     vb.on_resize(Some(
         (|_: &mut UiMember, w: u16, h: u16| {
              println!("wb resized to {}/{}", w, h);
          }).into(),
     ));
 
-    let mut vbb = LinearLayout::new(layout::Orientation::Horizontal);
+    let mut vbb = LinearLayout::with_orientation(layout::Orientation::Horizontal);
     vbb.set_layout_padding(layout::BoundarySize::AllTheSame(5).into());
-    let mut button = Button::new("Butt0");
+    let mut button = Button::with_label("Butt0");
     button.set_layout_width(layout::Size::WrapContent);
     button.set_layout_height(layout::Size::WrapContent);
     button.set_layout_padding(layout::BoundarySize::AllTheSame(5).into());
-    vbb.push_child(button);
+    vbb.push_child(button.into_control());
     
-    let mut button = Button::new("Butt00");
+    let mut button = Button::with_label("Butt00");
     button.set_layout_width(layout::Size::WrapContent);
     button.set_layout_height(layout::Size::WrapContent);
     button.set_layout_padding(layout::BoundarySize::AllTheSame(5).into());
-    vbb.push_child(button);
+    vbb.push_child(button.into_control());
     
-    let mut frame = Frame::new("Horizontal Frame");
-    frame.set_child(Some(vbb));
+    //let mut frame = Frame::new("Horizontal Frame");
+    //frame.set_child(Some(vbb));
 
-    vb.push_child(frame);
+    //vb.push_child(frame);
+    vb.push_child(vbb.into_control());
 
-    let mut button = Button::new("Butt1");
-    let butt1_id = button.as_base().id();
+    let mut button = Button::with_label("Butt1");
+    let butt1_id = button.id();
     //button.set_layout_params(layout::Params::WrapContent, layout::Params::MatchParent);
     button.on_click(Some(
         (|b: &mut UiButton| {
@@ -54,58 +57,36 @@ fn main() {
              println!("button resized too to {}/{}", w, h);
          }).into(),
     ));
-    vb.push_child(button);*/
+    vb.push_child(button.into_control());
 
     let mut button = Button::with_label("Butt2");
     //button.set_layout_params(layout::Params::WrapContent, layout::Params::MatchParent);
     button.on_click(Some(
         (move |b: &mut UiButton| {
             println!("button clicked: {} / {:?}", b.label(), b.as_control().id());
-           /* {
-                let parent = b.parent().unwrap();
-                let parent_member_id = parent.member_id();
+            /*{
+            	let parent = b.parent().unwrap();
+                let parent_member_id = parent.get_type_id();
                 println!("parent is {:?}", parent_member_id);
 
-                let parent: &UiContainer = match parent_member_id {
-                    members::MEMBER_ID_WINDOW => {
-                        let parent: &Window = utils::common_to_impl(parent);
-                        parent
-                    }
-                    members::MEMBER_ID_LAYOUT_LINEAR => {
-                        let parent: &LinearLayout = utils::common_to_impl(parent);
-                        parent
-                    }
-                    _ => unreachable!(),
-                };
+                let parent: &UiContainer = parent.is_container().unwrap();
 
                 println!(
                     "clicked is {:?}",
                     parent
-                        .find_control_by_id(b.as_base().id())
+                        .find_control_by_id(b.id())
                         .unwrap()
-                        .as_base()
-                        .member_id()
+                        .get_type_id()
                 );
-            }
+            }*/
             let root = b.root_mut().unwrap();
-            let root_member_id = root.member_id();
+            let root_member_id = root.as_any().get_type_id();
             println!("root is {:?}", root_member_id);
 
-            let root: &mut UiContainer = match root_member_id {
-                members::MEMBER_ID_WINDOW => {
-                    let root: &mut Window = utils::common_to_impl_mut(root);
-                    println!("ROOT IS {}", root.label());
-                    root
-                }
-                members::MEMBER_ID_LAYOUT_LINEAR => {
-                    let root: &mut LinearLayout = utils::common_to_impl_mut(root);
-                    root
-                }
-                _ => unreachable!(),
-            };
+            let root: &mut UiContainer = root.is_container_mut().unwrap();
 
             let butt1 = root.find_control_by_id_mut(butt1_id).unwrap();
-            butt1.set_visibility(Visibility::Visible);*/
+            butt1.set_visibility(Visibility::Visible);
         }).into(),
     ));
     button.on_resize(Some(
@@ -113,11 +94,11 @@ fn main() {
              println!("button resized too to {}/{}", w, h);
          }).into(),
     ));
-    //vb.push_child(button);
+    vb.push_child(button.into_control());
 
-    //window.set_child(Some(vb));
+    window.set_child(Some(vb.into_control()));
 
-    window.set_child(Some(button.into_control()));
+    //window.set_child(Some(button.into_control()));
 
     application.start();
 }
