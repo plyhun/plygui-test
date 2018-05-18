@@ -36,11 +36,11 @@ fn main() {
     button.set_layout_padding(layout::BoundarySize::AllTheSame(5).into());
     vbb.push_child(button.into_control());
     
-    //let mut frame = Frame::new("Horizontal Frame");
-    //frame.set_child(Some(vbb));
+    let mut frame = Frame::with_label("Horizontal Frame");
+    frame.set_child(Some(vbb.into_control()));
 
-    //vb.push_child(frame);
-    vb.push_child(vbb.into_control());
+    vb.push_child(frame.into_control());
+    //vb.push_child(vbb.into_control());
 
     let mut button = Button::with_label("Butt1");
     let butt1_id = button.id();
@@ -64,9 +64,9 @@ fn main() {
     button.on_click(Some(
         (move |b: &mut UiButton| {
             println!("button clicked: {} / {:?}", b.label(), b.as_control().id());
-            /*{
+            {
             	let parent = b.parent().unwrap();
-                let parent_member_id = parent.get_type_id();
+                let parent_member_id = parent.as_any().get_type_id();
                 println!("parent is {:?}", parent_member_id);
 
                 let parent: &UiContainer = parent.is_container().unwrap();
@@ -76,9 +76,10 @@ fn main() {
                     parent
                         .find_control_by_id(b.id())
                         .unwrap()
+                        .as_any()
                         .get_type_id()
                 );
-            }*/
+            }
             let root = b.root_mut().unwrap();
             let root_member_id = root.as_any().get_type_id();
             println!("root is {:?}", root_member_id);
