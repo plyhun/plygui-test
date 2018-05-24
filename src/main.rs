@@ -4,6 +4,27 @@ extern crate plygui;
 
 use plygui::*;
 
+fn create_frame() -> Box<UiControl> {
+	let mut vbb = LinearLayout::with_orientation(layout::Orientation::Horizontal);
+    vbb.set_layout_padding(layout::BoundarySize::AllTheSame(5).into());
+    let mut button = Button::with_label("Butt0");
+    button.set_layout_width(layout::Size::WrapContent);
+    button.set_layout_height(layout::Size::WrapContent);
+    button.set_layout_padding(layout::BoundarySize::AllTheSame(5).into());
+    vbb.push_child(button.into_control());
+    
+    let mut button = Button::with_label("Butt00");
+    button.set_layout_width(layout::Size::WrapContent);
+    button.set_layout_height(layout::Size::WrapContent);
+    button.set_layout_padding(layout::BoundarySize::AllTheSame(5).into());
+    vbb.push_child(button.into_control());
+    
+    let mut frame = Frame::with_label("Horizontal Frame");
+    frame.set_child(Some(vbb.into_control()));
+	
+	frame.into_control()
+}
+
 fn main() {
     let mut application = Application::with_name("Plygui test");
 
@@ -22,24 +43,8 @@ fn main() {
          }).into(),
     ));
 
-    let mut vbb = LinearLayout::with_orientation(layout::Orientation::Horizontal);
-    vbb.set_layout_padding(layout::BoundarySize::AllTheSame(5).into());
-    let mut button = Button::with_label("Butt0");
-    button.set_layout_width(layout::Size::WrapContent);
-    button.set_layout_height(layout::Size::WrapContent);
-    button.set_layout_padding(layout::BoundarySize::AllTheSame(5).into());
-    vbb.push_child(button.into_control());
     
-    let mut button = Button::with_label("Butt00");
-    button.set_layout_width(layout::Size::WrapContent);
-    button.set_layout_height(layout::Size::WrapContent);
-    button.set_layout_padding(layout::BoundarySize::AllTheSame(5).into());
-    vbb.push_child(button.into_control());
-    
-    let mut frame = Frame::with_label("Horizontal Frame");
-    frame.set_child(Some(vbb.into_control()));
-
-    vb.push_child(frame.into_control());
+    //vb.push_child(frame.into_control());
     //vb.push_child(vbb.into_control());
 
     let mut button = Button::with_label("Butt1");
@@ -50,6 +55,14 @@ fn main() {
              println!("button clicked: {}", b.label());
              b.set_visibility(Visibility::Gone);
              //b.set_visibility(Visibility::Invisible);
+             
+             let parent = b.is_control_mut().unwrap().parent_mut().unwrap().is_container_mut().unwrap().is_multi_mut().unwrap();
+             
+             if parent.len() < 3 {
+             	parent.push_child(create_frame());
+             } else {
+             	parent.pop_child();
+             }
          }).into(),
     ));
     button.on_resize(Some(
@@ -102,4 +115,6 @@ fn main() {
     //window.set_child(Some(button.into_control()));
 
     application.start();
+    
+    println!("Exiting");
 }
