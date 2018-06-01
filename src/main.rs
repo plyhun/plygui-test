@@ -5,49 +5,38 @@ extern crate plygui;
 use plygui::*;
 
 fn create_frame() -> Box<Control> {
-	let mut vbb = imp::LinearLayout::with_orientation(layout::Orientation::Horizontal);
+	let mut frame = imp::Frame::with_label("Horizontal Frame");    
+    
+    /*let mut vbb = imp::LinearLayout::with_orientation(layout::Orientation::Horizontal);
     vbb.set_layout_padding(layout::BoundarySize::AllTheSame(5).into());
-    let mut button = imp::Button::with_label("Butt0");
-    button.set_layout_width(layout::Size::WrapContent);
-    button.set_layout_height(layout::Size::WrapContent);
-    button.set_layout_padding(layout::BoundarySize::AllTheSame(5).into());
-    vbb.push_child(button.into_control());
     
-    let mut button = imp::Button::with_label("Butt00");
-    button.set_layout_width(layout::Size::WrapContent);
-    button.set_layout_height(layout::Size::WrapContent);
-    button.set_layout_padding(layout::BoundarySize::AllTheSame(5).into());
-    vbb.push_child(button.into_control());
+    vbb.push_child(create_button("Butt 0"));
+    vbb.push_child(create_button("Butt 1"));
     
-    let mut frame = imp::Frame::with_label("Horizontal Frame");
-    frame.set_child(Some(vbb.into_control()));
+    frame.set_child(Some(vbb.into_control()));*/
+    
+    frame.set_child(Some(create_vertical_layout()));
 	
 	frame.into_control()
 }
 
-fn main() {
-    let mut application = imp::Application::with_name("Plygui test");
+fn create_button(name: &str) -> Box<Control> {
+	let mut button = imp::Button::with_label(name);
+    button.set_layout_width(layout::Size::WrapContent);
+    button.set_layout_height(layout::Size::WrapContent);
+    button.set_layout_padding(layout::BoundarySize::AllTheSame(5).into());
+    button.into_control()
+}
 
-    let mut window = application.new_window("plygui!!", WindowStartSize::Exact(200, 200), WindowMenu::None);
-
-    window.on_resize(Some(
-        (|_: &mut Member, w: u16, h: u16| {
-             println!("win resized to {}/{}", w, h);
-         }).into(),
-    ));
-
-    let mut vb = imp::LinearLayout::with_orientation(layout::Orientation::Vertical);
+fn create_vertical_layout() -> Box<Control> {
+	let mut vb = imp::LinearLayout::with_orientation(layout::Orientation::Vertical);
     vb.on_resize(Some(
         (|_: &mut Member, w: u16, h: u16| {
              println!("wb resized to {}/{}", w, h);
          }).into(),
     ));
 
-    
-    //vb.push_child(frame.into_control());
-    //vb.push_child(vbb.into_control());
-
-    let mut button = imp::Button::with_label("Butt1");
+	let mut button = imp::Button::with_label("Butt1");
     let butt1_id = button.id();
     //button.set_layout_params(layout::Params::WrapContent, layout::Params::MatchParent);
     button.on_click(Some(
@@ -60,6 +49,8 @@ fn main() {
              
              if parent.len() < 3 {
              	parent.push_child(create_frame());
+             	//parent.push_child(create_button("Buuu"));
+             	//parent.push_child(create_vertical_layout());
              } else {
              	parent.pop_child();
              }
@@ -109,8 +100,21 @@ fn main() {
          }).into(),
     ));
     vb.push_child(button.into_control());
+    vb.into_control()
+}
 
-    window.set_child(Some(vb.into_control()));
+fn main() {
+    let mut application = imp::Application::with_name("Plygui test");
+
+    let mut window = application.new_window("plygui!!", WindowStartSize::Exact(200, 200), WindowMenu::None);
+
+    window.on_resize(Some(
+        (|_: &mut Member, w: u16, h: u16| {
+             println!("win resized to {}/{}", w, h);
+         }).into(),
+    ));
+
+    window.set_child(Some(create_vertical_layout()));
 
     //window.set_child(Some(button.into_control()));
 
