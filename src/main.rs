@@ -4,103 +4,113 @@ extern crate plygui;
 
 use plygui::*;
 
-fn create_frame() -> Box<Control> {
+/*fn create_frame() -> Box<Control> {
 	let mut frame = imp::Frame::with_label("Horizontal Frame");    
     
-    /*let mut vbb = imp::LinearLayout::with_orientation(layout::Orientation::Horizontal);
-    vbb.set_layout_padding(layout::BoundarySize::AllTheSame(5).into());
-    
-    vbb.push_child(create_button("Butt 0"));
-    vbb.push_child(create_button("Butt 1"));
-    
-    frame.set_child(Some(vbb.into_control()));*/
-    
-    frame.set_child(Some(create_vertical_layout()));
+    frame.set_child(Some(create_splitted()));
+    //frame.set_child(Some(create_vertical_layout()));
 	
 	frame.into_control()
 }
 
-fn create_button(name: &str) -> Box<Control> {
+fn create_splitted() -> Box<Control> {
+	//let mut splitted = imp::Splitted::with_content(create_button("Bu 1"), create_button("Bu 2"), layout::Orientation::Horizontal);
+	let mut splitted = imp::Splitted::with_content(create_vertical_layout(), create_vertical_layout(), layout::Orientation::Horizontal);
+	splitted.set_layout_width(layout::Size::MatchParent);
+    splitted.set_layout_height(layout::Size::WrapContent);
+    splitted.into_control()
+}*/
+
+fn create_button<F>(name: &str, f: F) -> Box<Control> where F: FnMut(&mut dyn Button) + 'static {
 	let mut button = imp::Button::with_label(name);
     button.set_layout_width(layout::Size::WrapContent);
     button.set_layout_height(layout::Size::WrapContent);
     button.set_layout_padding(layout::BoundarySize::AllTheSame(5).into());
+    button.on_click(Some(f.into()));
+    button.on_resize(Some(
+        (|_: &mut Member, w: u16, h: u16| {
+             println!("button resized too to {}/{}", w, h);
+         }).into(),
+    ));
     button.into_control()
 }
 
-fn create_vertical_layout() -> Box<Control> {
+fn create_vertical_layout(mut args: Vec<Box<Control>>) -> Box<Control> {
 	let mut vb = imp::LinearLayout::with_orientation(layout::Orientation::Vertical);
     vb.on_resize(Some(
         (|_: &mut Member, w: u16, h: u16| {
-             println!("wb resized to {}/{}", w, h);
+             println!("vb resized to {}/{}", w, h);
          }).into(),
     ));
-
-	let mut button = imp::Button::with_label("Butt1");
-    let butt1_id = button.id();
-    //button.set_layout_params(layout::Params::WrapContent, layout::Params::MatchParent);
-    button.on_click(Some(
-        (|b: &mut Button| {
-             println!("button clicked: {}", b.label());
-             b.set_visibility(Visibility::Gone);
-             //b.set_visibility(Visibility::Invisible);
-             
-             let parent = b.is_control_mut().unwrap().parent_mut().unwrap().is_container_mut().unwrap().is_multi_mut().unwrap();
-             
-             if parent.len() < 3 {
-             	parent.push_child(create_frame());
-             	//parent.push_child(create_button("Buuu"));
-             	//parent.push_child(create_vertical_layout());
-             } else {
-             	parent.pop_child();
-             }
-         }).into(),
-    ));
-    button.on_resize(Some(
-        (|_: &mut Member, w: u16, h: u16| {
-             println!("button resized too to {}/{}", w, h);
-         }).into(),
-    ));
-    vb.push_child(button.into_control());
-
-    let mut button = imp::Button::with_label("Butt2");
-    //button.set_layout_params(layout::Params::WrapContent, layout::Params::MatchParent);
-    button.on_click(Some(
-        (move |b: &mut Button| {
-            println!("button clicked: {} / {:?}", b.label(), b.as_control().id());
-            {
-            	let parent = b.parent().unwrap();
-                let parent_member_id = parent.as_any().get_type_id();
-                println!("parent is {:?}", parent_member_id);
-
-                let parent: &Container = parent.is_container().unwrap();
-
-                println!(
-                    "clicked is {:?}",
-                    parent
-                        .find_control_by_id(b.id())
-                        .unwrap()
-                        .as_any()
-                        .get_type_id()
-                );
-            }
-            let root = b.root_mut().unwrap();
-            let root_member_id = root.as_any().get_type_id();
-            println!("root is {:?}", root_member_id);
-
-            let root: &mut Container = root.is_container_mut().unwrap();
-
-            let butt1 = root.find_control_by_id_mut(butt1_id).unwrap();
-            butt1.set_visibility(Visibility::Visible);
-        }).into(),
-    ));
-    button.on_resize(Some(
-        (|_: &mut Member, w: u16, h: u16| {
-             println!("button resized too to {}/{}", w, h);
-         }).into(),
-    ));
-    vb.push_child(button.into_control());
+    for mut arg in args.drain(..) {
+        match vb.layout_orientation() {
+            layout::Orientation::Horizontal => {
+                arg.set_layout_width(layout::Size::WrapContent);
+                arg.set_layout_height(layout::Size::MatchParent);
+            },
+            layout::Orientation::Vertical => {
+                arg.set_layout_width(layout::Size::MatchParent);
+                arg.set_layout_height(layout::Size::WrapContent);
+            },
+        }
+        vb.push_child(arg);
+    }
     vb.into_control()
+}
+
+fn root() -> Box<Control> {
+    create_vertical_layout(
+        vec![
+            create_button("Button #1", |b: &mut Button| {
+                println!("button clicked: {}", b.label());
+                b.set_visibility(Visibility::Gone);
+                //b.set_visibility(Visibility::Invisible);
+                
+                let parent = b.is_control_mut().unwrap().parent_mut().unwrap().is_container_mut().unwrap().is_multi_mut().unwrap();
+                
+                if parent.len() < 3 {
+                	//parent.push_child(create_frame());
+                	//parent.push_child(create_splitted());
+                	//parent.push_child(create_button("Buuu"));
+                	println!("add child");
+                	parent.push_child(root());
+                } else {
+                    println!("remove child");
+                	parent.pop_child();
+                }
+            }), 
+            create_button("Button #2", |b: &mut Button| {
+                println!("button clicked: {} / {:?}", b.label(), b.as_control().id());
+                {
+                    let id = b.id();
+                	let parent = b.parent_mut().unwrap();
+                    let parent_member_id = parent.as_any().get_type_id();
+                    println!("parent is {:?}", parent_member_id);
+    
+                    let parent = parent.is_container_mut().unwrap();
+                    println!(
+                        "clicked is {:?}",
+                        parent
+                            .find_control_by_id(id)
+                            .unwrap()
+                            .as_any()
+                            .get_type_id()
+                    );
+                    
+                    let parent = parent.is_multi_mut().unwrap();
+                    parent.child_at_mut(0).unwrap().set_visibility(Visibility::Visible);
+                }
+                /*let root = b.root_mut().unwrap();
+                let root_member_id = root.as_any().get_type_id();
+                println!("root is {:?}", root_member_id);
+    
+                let root: &mut Container = root.is_container_mut().unwrap();
+    
+                let butt1 = root.find_control_by_id_mut(butt1_id).unwrap();
+                butt1.set_visibility(Visibility::Visible);*/
+            })
+        ]
+    )
 }
 
 fn main() {
@@ -114,8 +124,8 @@ fn main() {
          }).into(),
     ));
 
-    window.set_child(Some(create_vertical_layout()));
-
+    window.set_child(Some(root()));
+    //window.set_child(Some(create_frame()));
     //window.set_child(Some(button.into_control()));
 
     application.start();
