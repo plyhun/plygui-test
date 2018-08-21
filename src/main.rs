@@ -25,7 +25,6 @@ fn create_button<F>(name: &str, f: F) -> Box<Control> where F: FnMut(&mut dyn Bu
 	let mut button = imp::Button::with_label(name);
     button.set_layout_width(layout::Size::WrapContent);
     button.set_layout_height(layout::Size::WrapContent);
-    button.set_layout_padding(layout::BoundarySize::AllTheSame(5).into());
     button.on_click(Some(f.into()));
     button.on_resize(Some(
         (|_: &mut Member, w: u16, h: u16| {
