@@ -4,22 +4,18 @@ extern crate plygui;
 
 use plygui::*;
 
-/*fn create_frame() -> Box<Control> {
-	let mut frame = imp::Frame::with_label("Horizontal Frame");    
-    
-    frame.set_child(Some(create_splitted()));
-    //frame.set_child(Some(create_vertical_layout()));
-	
-	frame.into_control()
+fn create_frame(name: &str, child: Box<Control>) -> Box<Control> {
+	let mut frame = imp::Frame::with_label(name);    
+    frame.set_child(Some(child));
+    frame.into_control()
 }
 
-fn create_splitted() -> Box<Control> {
-	//let mut splitted = imp::Splitted::with_content(create_button("Bu 1"), create_button("Bu 2"), layout::Orientation::Horizontal);
-	let mut splitted = imp::Splitted::with_content(create_vertical_layout(), create_vertical_layout(), layout::Orientation::Horizontal);
+fn create_splitted(first: Box<Control>, second: Box<Control>) -> Box<Control> {
+	let mut splitted = imp::Splitted::with_content(first, second, layout::Orientation::Horizontal);
 	splitted.set_layout_width(layout::Size::MatchParent);
     splitted.set_layout_height(layout::Size::WrapContent);
     splitted.into_control()
-}*/
+}
 
 fn create_button<F>(name: &str, f: F) -> Box<Control> where F: FnMut(&mut dyn Button) + 'static {
 	let mut button = imp::Button::with_label(name);
@@ -57,59 +53,70 @@ fn create_vertical_layout(mut args: Vec<Box<Control>>) -> Box<Control> {
     vb.into_control()
 }
 
+fn button_click(b: &mut Button) {
+    println!("button clicked: {}", b.label());
+    b.set_visibility(Visibility::Gone);
+    //b.set_visibility(Visibility::Invisible);
+    
+    let parent = b.is_control_mut().unwrap().parent_mut().unwrap().is_container_mut().unwrap().is_multi_mut().unwrap();
+    
+    if parent.len() < 3 {
+    	println!("add child");
+    	parent.push_child(root());
+    } else {
+        println!("remove child");
+    	parent.pop_child();
+    }
+}
+
 fn root() -> Box<Control> {
-    create_vertical_layout(
-        vec![
-            create_button("Button #1", |b: &mut Button| {
-                println!("button clicked: {}", b.label());
-                b.set_visibility(Visibility::Gone);
-                //b.set_visibility(Visibility::Invisible);
-                
-                let parent = b.is_control_mut().unwrap().parent_mut().unwrap().is_container_mut().unwrap().is_multi_mut().unwrap();
-                
-                if parent.len() < 3 {
-                	//parent.push_child(create_frame());
-                	//parent.push_child(create_splitted());
-                	//parent.push_child(create_button("Buuu"));
-                	println!("add child");
-                	parent.push_child(root());
-                } else {
-                    println!("remove child");
-                	parent.pop_child();
-                }
-            }), 
-            create_button("Button #2", |b: &mut Button| {
-                println!("button clicked: {} / {:?}", b.label(), b.as_control().id());
-                {
-                    let id = b.id();
-                	let parent = b.parent_mut().unwrap();
-                    let parent_member_id = parent.as_any().get_type_id();
-                    println!("parent is {:?}", parent_member_id);
+    let click_2 = |b: &mut Button| {
+        println!("button clicked: {} / {:?}", b.label(), b.as_control().id());
+        {
+            let id = b.id();
+        	let parent = b.parent_mut().unwrap();
+            let parent_member_id = parent.as_any().get_type_id();
+            println!("parent is {:?}", parent_member_id);
+
+            let parent = parent.is_container_mut().unwrap();
+            println!(
+                "clicked is {:?}",
+                parent
+                    .find_control_by_id(id)
+                    .unwrap()
+                    .as_any()
+                    .get_type_id()
+            );
+            
+            let parent = parent.is_multi_mut().unwrap();
+            parent.child_at_mut(0).unwrap().set_visibility(Visibility::Visible);
+        }
+        /*let root = b.root_mut().unwrap();
+        let root_member_id = root.as_any().get_type_id();
+        println!("root is {:?}", root_member_id);
+
+        let root: &mut Container = root.is_container_mut().unwrap();
+
+        let butt1 = root.find_control_by_id_mut(butt1_id).unwrap();
+        butt1.set_visibility(Visibility::Visible);*/
+    };
     
-                    let parent = parent.is_container_mut().unwrap();
-                    println!(
-                        "clicked is {:?}",
-                        parent
-                            .find_control_by_id(id)
-                            .unwrap()
-                            .as_any()
-                            .get_type_id()
-                    );
-                    
-                    let parent = parent.is_multi_mut().unwrap();
-                    parent.child_at_mut(0).unwrap().set_visibility(Visibility::Visible);
-                }
-                /*let root = b.root_mut().unwrap();
-                let root_member_id = root.as_any().get_type_id();
-                println!("root is {:?}", root_member_id);
-    
-                let root: &mut Container = root.is_container_mut().unwrap();
-    
-                let butt1 = root.find_control_by_id_mut(butt1_id).unwrap();
-                butt1.set_visibility(Visibility::Visible);*/
-            })
-        ]
+    create_splitted(
+        create_frame("Frame #1", create_vertical_layout(
+            vec![
+                create_button("Button #1", button_click), 
+                create_button("Button #2", click_2)
+            ]
+        )),
+        create_frame("Frame #2", create_vertical_layout(
+            vec![
+                create_button("Button #1", button_click), 
+                create_button("Button #2", click_2)
+            ]
+        )),
     )
+    
+    
 }
 
 fn main() {
