@@ -91,16 +91,7 @@ fn root() -> Box<Control> {
             let parent = parent.is_multi_mut().unwrap();
             parent.child_at_mut(0).unwrap().set_visibility(Visibility::Visible);
         }
-        /*let root = b.root_mut().unwrap();
-        let root_member_id = root.as_any().get_type_id();
-        println!("root is {:?}", root_member_id);
-
-        let root: &mut Container = root.is_container_mut().unwrap();
-
-        let butt1 = root.find_control_by_id_mut(butt1_id).unwrap();
-        butt1.set_visibility(Visibility::Visible);*/
     };
-    
     create_splitted(
         create_frame("Frame #1", create_vertical_layout(
             vec![
@@ -115,25 +106,17 @@ fn root() -> Box<Control> {
             ]
         )),
     )
-    
-    
 }
 
 fn main() {
     let mut application = imp::Application::with_name("Plygui test");
-
     let mut window = application.new_window("plygui!!", WindowStartSize::Exact(200, 200), WindowMenu::None);
-
     window.on_resize(Some(
         (|_: &mut Member, w: u16, h: u16| {
              println!("win resized to {}/{}", w, h);
          }).into(),
     ));
-
     window.set_child(Some(root()));
-    //window.set_child(Some(create_frame()));
-    //window.set_child(Some(button.into_control()));
-
     application.start();
     
     println!("Exiting");
