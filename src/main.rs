@@ -17,7 +17,7 @@ fn create_splitted(first: Box<Control>, second: Box<Control>) -> Box<Control> {
     splitted.into_control()
 }
 
-fn create_button<F>(name: &str, f: F) -> Box<Control> where F: FnMut(&mut dyn Button) + 'static {
+fn create_button<F>(name: &str, f: F) -> Box<Control> where F: FnMut(&mut dyn Clickable) + 'static {
 	let mut button = imp::Button::with_label(name);
     button.set_layout_width(layout::Size::WrapContent);
     button.set_layout_height(layout::Size::WrapContent);
@@ -53,7 +53,9 @@ fn create_vertical_layout(mut args: Vec<Box<Control>>) -> Box<Control> {
     vb.into_control()
 }
 
-fn button_click(b: &mut Button) {
+fn button_click(b: &mut Clickable) {
+	let b = b.as_any_mut().downcast_mut::<imp::Button>().unwrap();
+	
     println!("button clicked: {}", b.label());
     b.set_visibility(Visibility::Gone);
     //b.set_visibility(Visibility::Invisible);
@@ -70,7 +72,9 @@ fn button_click(b: &mut Button) {
 }
 
 fn root() -> Box<Control> {
-    let click_2 = |b: &mut Button| {
+    let click_2 = |b: &mut Clickable| {
+    	let b = b.as_any_mut().downcast_mut::<imp::Button>().unwrap();
+    	
         println!("button clicked: {} / {:?}", b.label(), b.as_control().id());
         {
             let id = b.id();
