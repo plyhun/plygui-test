@@ -10,6 +10,11 @@ fn create_frame(name: &str, child: Box<Control>) -> Box<Control> {
     frame.into_control()
 }
 
+fn create_text(text: &str) -> Box<Control> {
+    let mut text = imp::Text::with_text(text);
+    text.into_control()
+}
+
 fn create_splitted(first: Box<Control>, second: Box<Control>) -> Box<Control> {
 	let mut splitted = imp::Splitted::with_content(first, second, layout::Orientation::Horizontal);
 	splitted.set_layout_width(layout::Size::MatchParent);
@@ -57,7 +62,7 @@ fn button_click(b: &mut Clickable) {
 	let b = b.as_any_mut().downcast_mut::<imp::Button>().unwrap();
 	
     println!("button clicked: {}", b.label());
-    b.set_visibility(Visibility::Gone);
+    //b.set_visibility(Visibility::Gone);
     //b.set_visibility(Visibility::Invisible);
     
     let parent = b.is_control_mut().unwrap().parent_mut().unwrap().is_container_mut().unwrap().is_multi_mut().unwrap();
@@ -100,13 +105,15 @@ fn root() -> Box<Control> {
         create_frame("Frame #1", create_vertical_layout(
             vec![
                 create_button("Button #1", button_click), 
-                create_button("Button #2", click_2)
+                //create_button("Button #2", click_2),
+                create_text("I am text"),
             ]
         )),
         create_frame("Frame #2", create_vertical_layout(
             vec![
                 create_button("Button #1", button_click), 
-                create_button("Button #2", click_2)
+                //create_button("Button #2", click_2),
+                create_text("I'm a text too"),
             ]
         )),
     )
