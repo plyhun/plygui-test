@@ -2,6 +2,7 @@
 name = "plygui-test"
 version = "0.1.0"
 authors = ["snuk182 <snuk188@gmail.com>"]
+edition = "2018"
 
 [[bin]]
 name = "uitest"

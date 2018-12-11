@@ -1,44 +1,44 @@
 #![feature(get_type_id)]
 
-extern crate plygui;
+
 
 use plygui::*;
 
-fn create_frame(name: &str, child: Box<Control>) -> Box<Control> {
+fn create_frame(name: &str, child: Box<dyn Control>) -> Box<dyn Control> {
 	let mut frame = imp::Frame::with_label(name);    
     frame.set_child(Some(child));
     frame.into_control()
 }
 
-fn create_text(text: &str) -> Box<Control> {
-    let mut text = imp::Text::with_text(text);
+fn create_text(text: &str) -> Box<dyn Control> {
+    let text = imp::Text::with_text(text);
     text.into_control()
 }
 
-fn create_splitted(first: Box<Control>, second: Box<Control>) -> Box<Control> {
+fn create_splitted(first: Box<dyn Control>, second: Box<dyn Control>) -> Box<dyn Control> {
 	let mut splitted = imp::Splitted::with_content(first, second, layout::Orientation::Horizontal);
 	splitted.set_layout_width(layout::Size::MatchParent);
     splitted.set_layout_height(layout::Size::WrapContent);
     splitted.into_control()
 }
 
-fn create_button<F>(name: &str, f: F) -> Box<Control> where F: FnMut(&mut dyn Clickable) + 'static {
+fn create_button<F>(name: &str, f: F) -> Box<dyn Control> where F: FnMut(&mut dyn Clickable) + 'static {
 	let mut button = imp::Button::with_label(name);
     button.set_layout_width(layout::Size::WrapContent);
     button.set_layout_height(layout::Size::WrapContent);
     button.on_click(Some(f.into()));
     button.on_resize(Some(
-        (|_: &mut Member, w: u16, h: u16| {
+        (|_: &mut dyn Member, w: u16, h: u16| {
              println!("button resized too to {}/{}", w, h);
          }).into(),
     ));
     button.into_control()
 }
 
-fn create_vertical_layout(mut args: Vec<Box<Control>>) -> Box<Control> {
+fn create_vertical_layout(mut args: Vec<Box<dyn Control>>) -> Box<dyn Control> {
 	let mut vb = imp::LinearLayout::with_orientation(layout::Orientation::Vertical);
     vb.on_resize(Some(
-        (|_: &mut Member, w: u16, h: u16| {
+        (|_: &mut dyn Member, w: u16, h: u16| {
              println!("vb resized to {}/{}", w, h);
          }).into(),
     ));
@@ -58,7 +58,7 @@ fn create_vertical_layout(mut args: Vec<Box<Control>>) -> Box<Control> {
     vb.into_control()
 }
 
-fn button_click(b: &mut Clickable) {
+fn button_click(b: &mut dyn Clickable) {
 	let b = b.as_any_mut().downcast_mut::<imp::Button>().unwrap();
 	
     println!("button clicked: {}", b.label());
@@ -76,8 +76,8 @@ fn button_click(b: &mut Clickable) {
     }
 }
 
-fn root() -> Box<Control> {
-    let click_2 = |b: &mut Clickable| {
+fn root() -> Box<dyn Control> {
+    let _click_2 = |b: &mut dyn Clickable| {
     	let b = b.as_any_mut().downcast_mut::<imp::Button>().unwrap();
     	
         println!("button clicked: {} / {:?}", b.label(), b.as_control().id());
@@ -123,7 +123,7 @@ fn main() {
     let mut application = imp::Application::with_name("Plygui test");
     let mut window = application.new_window("plygui!!", WindowStartSize::Exact(200, 200), WindowMenu::None);
     window.on_resize(Some(
-        (|_: &mut Member, w: u16, h: u16| {
+        (|_: &mut dyn Member, w: u16, h: u16| {
              println!("win resized to {}/{}", w, h);
          }).into(),
     ));
