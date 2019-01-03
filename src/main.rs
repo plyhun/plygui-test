@@ -24,7 +24,7 @@ fn create_splitted(first: Box<dyn Control>, second: Box<dyn Control>) -> Box<dyn
 
 fn create_button<F>(name: &str, f: F) -> Box<dyn Control> where F: FnMut(&mut dyn Clickable) + 'static {
 	let mut button = imp::Button::with_label(name);
-    button.set_layout_width(layout::Size::WrapContent);
+    button.set_layout_width(layout::Size::MatchParent);
     button.set_layout_height(layout::Size::WrapContent);
     button.on_click(Some(f.into()));
     button.on_resize(Some(
