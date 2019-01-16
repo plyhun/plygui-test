@@ -70,11 +70,11 @@ fn button_click(b: &mut dyn Clickable) {
     if parent.len() < 3 {
     	println!("add child");
     	parent.push_child(root());
-    	imp::Alert::with_text("Doing", "So far so good", AlertSeverity::Info, Some(parent.as_member()));
+    	imp::Alert::with_content(TextContent::Plain("So far so good".into()), AlertSeverity::Info, Some(parent.as_member()));
     } else {
         println!("remove child");
     	parent.pop_child();
-    	imp::Alert::with_text("Crap happened", "We did all we could", AlertSeverity::Alert, Some(parent.as_member()));
+    	imp::Alert::with_content(TextContent::LabelDescription("Crap happened".into(), "We did all we could".into()), AlertSeverity::Alert, Some(parent.as_member()));
     }
 }
 
