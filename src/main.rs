@@ -71,7 +71,10 @@ fn button_click(b: &mut dyn Clickable) {
     	println!("add child");
     	parent.push_child(root());
     	imp::Alert::with_actions(TextContent::Plain("So far so good".into()), AlertSeverity::Info, vec![
-		    	("Ok".into(), (|_m: &mut dyn Member| { println!("Ok pressed"); true }).into()),
+		    	("Ok".into(), (|m: &mut dyn Member| {  
+		    	            imp::Alert::with_actions(TextContent::LabelDescription("Even better".into(), "Keep doing it".into()), AlertSeverity::Warning, vec![], Some(m));
+		    	            true
+		    	    }).into()),
 		    	("Close".into(), (|m: &mut dyn Member| { println!("{:?} closed", m.id()); false }).into())	
 	    	], Some(parent.as_member()));
     } else {
