@@ -142,7 +142,7 @@ fn root() -> Box<dyn Control> {
 }
 
 fn main() {
-    let mut application = imp::Application::with_name("Plygui test");
+    let mut application = imp::Application::init_with_name("Plygui test");
     let mut window = application.new_window("plygui!!", WindowStartSize::Exact(200, 200), WindowMenu::None);
     window.on_resize(Some(
         (|_: &mut dyn Member, w: u16, h: u16| {
