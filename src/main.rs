@@ -73,14 +73,14 @@ fn button_click(b: &mut dyn Clickable) {
     if parent.len() < 3 {
         println!("add child");
         parent.push_child(root());
-        imp::Alert::with_actions(
+        let _ = imp::Message::start_with_actions(
             TextContent::Plain("So far so good".into()),
-            AlertSeverity::Info,
+            MessageSeverity::Info,
             vec![
                 (
                     "Ok".into(),
                     (|m: &mut dyn Member| {
-                        imp::Alert::with_actions(TextContent::LabelDescription("Even better".into(), "Keep doing it".into()), AlertSeverity::Warning, vec![], Some(m));
+                        let _ = imp::Message::start_with_actions(TextContent::LabelDescription("Even better".into(), "Keep doing it".into()), MessageSeverity::Warning, vec![], Some(m));
                         true
                     })
                     .into(),
@@ -99,7 +99,7 @@ fn button_click(b: &mut dyn Clickable) {
     } else {
         println!("remove child");
         parent.pop_child();
-        imp::Alert::with_content(TextContent::LabelDescription("Crap happened".into(), "We did all we could".into()), AlertSeverity::Alert, Some(parent.as_member()));
+        let _ = imp::Message::with_content(TextContent::LabelDescription("Crap happened".into(), "We did all we could".into()), MessageSeverity::Alert, Some(parent.as_member())).start();
     }
 }
 
@@ -151,8 +151,31 @@ fn main() {
         .into(),
     ));
     window.on_close(Some(
-        (|m: &mut dyn Member| {
-            imp::Alert::with_actions(TextContent::LabelDescription("No close man".into(), "Srsly".into()), AlertSeverity::Warning, vec![], Some(m));
+        (|w: &mut dyn Member| {
+            let actions = vec![
+                (
+                    "Okay".into(),
+                    (|m: &mut dyn Member| {
+                        let _ = imp::Message::start_with_actions(TextContent::LabelDescription("Good boi".into(), "Keep working".into()), MessageSeverity::Info, vec![], Some(m));
+                        true
+                    })
+                    .into(),
+                ),
+                (
+                    "Close".into(),
+                    (|m: &mut dyn Member| {
+                        println!("{:?} closed", m.id());
+                        
+                        false
+                    })
+                    .into(),
+                ),
+            ];
+            if let Ok(answer) = imp::Message::start_with_actions(TextContent::LabelDescription("No close man".into(), "Srsly".into()), MessageSeverity::Warning, actions, Some(w)) {
+                if answer == "Close" {
+                    return true;
+                }
+            }
             false
         })
         .into(),
