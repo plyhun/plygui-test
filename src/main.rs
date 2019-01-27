@@ -165,7 +165,7 @@ fn main() {
                     "Close".into(),
                     (|m: &mut dyn Member| {
                         println!("{:?} closed", m.id());
-                        
+
                         false
                     })
                     .into(),
