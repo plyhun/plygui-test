@@ -162,7 +162,7 @@ fn main() {
                     .into(),
                 ),
                 (
-                    "Close".into(),
+                    "Close I said!".into(),
                     (|m: &mut dyn Member| {
                         println!("{:?} closed", m.id());
 
@@ -172,7 +172,7 @@ fn main() {
                 ),
             ];
             if let Ok(answer) = imp::Message::start_with_actions(TextContent::LabelDescription("No close man".into(), "Srsly".into()), MessageSeverity::Warning, actions, Some(w)) {
-                if answer == "Close" {
+                if answer == "Close I said!" {
                     return true;
                 }
             }
