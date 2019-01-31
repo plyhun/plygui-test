@@ -1,6 +1,4 @@
-#![feature(get_type_id)]
-
-use plygui::*;
+use plygui_qt::prelude::*;
 
 fn create_frame(name: &str, child: Box<dyn Control>) -> Box<dyn Control> {
     let mut frame = imp::Frame::with_label(name);
@@ -111,11 +109,11 @@ fn root() -> Box<dyn Control> {
         {
             let id = b.id();
             let parent = b.parent_mut().unwrap();
-            let parent_member_id = parent.as_any().get_type_id();
+            let parent_member_id = parent.as_any().type_id();
             println!("parent is {:?}", parent_member_id);
 
             let parent = parent.is_container_mut().unwrap();
-            println!("clicked is {:?}", parent.find_control_by_id(id).unwrap().as_any().get_type_id());
+            println!("clicked is {:?}", parent.find_control_by_id(id).unwrap().as_any().type_id());
 
             let parent = parent.is_multi_mut().unwrap();
             parent.child_at_mut(0).unwrap().set_visibility(Visibility::Visible);
