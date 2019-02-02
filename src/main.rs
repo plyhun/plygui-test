@@ -1,4 +1,4 @@
-use plygui_qt::prelude::*;
+use plygui::*;
 
 fn create_frame(name: &str, child: Box<dyn Control>) -> Box<dyn Control> {
     let mut frame = imp::Frame::with_label(name);
