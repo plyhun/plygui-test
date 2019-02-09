@@ -26,8 +26,8 @@ where
     button.set_layout_width(layout::Size::MatchParent);
     button.set_layout_height(layout::Size::WrapContent);
     button.on_click(Some(f.into()));
-    button.on_resize(Some(
-        (|_: &mut dyn Member, w: u16, h: u16| {
+    button.on_size(Some(
+        (|_: &mut dyn HasSize, w: u16, h: u16| {
             println!("button resized too to {}/{}", w, h);
         })
         .into(),
@@ -37,8 +37,8 @@ where
 
 fn create_vertical_layout(mut args: Vec<Box<dyn Control>>) -> Box<dyn Control> {
     let mut vb = imp::LinearLayout::with_orientation(layout::Orientation::Vertical);
-    vb.on_resize(Some(
-        (|_: &mut dyn Member, w: u16, h: u16| {
+    vb.on_size(Some(
+        (|_: &mut dyn HasSize, w: u16, h: u16| {
             println!("vb resized to {}/{}", w, h);
         })
         .into(),
@@ -140,10 +140,11 @@ fn root() -> Box<dyn Control> {
 }
 
 fn main() {
-    let mut application = imp::Application::init_with_name("Plygui test");
-    let mut window = application.new_window("plygui!!", WindowStartSize::Exact(200, 200), WindowMenu::None);
-    window.on_resize(Some(
-        (|_: &mut dyn Member, w: u16, h: u16| {
+    let mut application = imp::Application::get();
+    
+    let mut window = application.new_window("plygui!!", WindowStartSize::Exact(200, 200), Menu::None);
+    window.on_size(Some(
+        (|_: &mut dyn HasSize, w: u16, h: u16| {
             println!("win resized to {}/{}", w, h);
         })
         .into(),
@@ -179,6 +180,9 @@ fn main() {
         .into(),
     ));
     window.set_child(Some(root()));
+    
+    let tray = application.new_tray("Tray of Plygui", Menu::None);
+    
     application.start();
 
     println!("Exiting");
