@@ -182,6 +182,7 @@ fn main() {
     window.set_child(Some(root()));
     
     let tray = application.new_tray("Tray of Plygui", Menu::None);
+    let wi = application.new_window("guiply %)", WindowStartSize::Exact(100, 100), Menu::None);
     
     application.start();
 
