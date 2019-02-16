@@ -3,6 +3,18 @@ name = "plygui-test"
 version = "0.1.0"
 authors = ["snuk182 <snuk188@gmail.com>"]
 edition = "2018"
+description = "Plygui Test"
+
+# start with `cargo bundle --bin uitest`
+[package.metadata.bundle.bin.uitest]
+name = "plygui"
+identifier = "plygui.test"
+icon = ["resources/icon*.png"]
+category = "Utility"
+short_description = "Test application of Plygui"
+long_description = """
+An application with a demonstration of random features of Plygui framework.
+"""
 
 [[bin]]
 name = "uitest"

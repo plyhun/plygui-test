@@ -1,5 +1,18 @@
 use plygui::*;
 
+use std::fs::*;
+use std::io::BufReader;
+
+fn create_image() -> Box<Control> {
+	let img = external::image::load(BufReader::new(File::open("resources/lulz.png").unwrap()), external::image::PNG).unwrap();
+	
+	let mut i = imp::Image::with_content(img);
+	i.set_scale(ImageScalePolicy::CropCenter);
+	i.set_layout_width(layout::Size::MatchParent);
+    i.set_layout_height(layout::Size::WrapContent);
+    
+	i.into_control()
+}
 fn create_frame(name: &str, child: Box<dyn Control>) -> Box<dyn Control> {
     let mut frame = imp::Frame::with_label(name);
     frame.set_child(Some(child));
@@ -68,7 +81,7 @@ fn button_click(b: &mut dyn Clickable) {
 
     let parent = b.is_control_mut().unwrap().parent_mut().unwrap().is_container_mut().unwrap().is_multi_mut().unwrap();
 
-    if parent.len() < 3 {
+    if parent.len() < 4 {
         println!("add child");
         parent.push_child(root());
         let _ = imp::Message::start_with_actions(
@@ -126,6 +139,7 @@ fn root() -> Box<dyn Control> {
                 create_button("Button #1", button_click),
                 //create_button("Button #2", click_2),
                 create_text("I am text"),
+                create_image(),
             ]),
         ),
         create_frame(
@@ -134,6 +148,7 @@ fn root() -> Box<dyn Control> {
                 create_button("Button #1", button_click),
                 //create_button("Button #2", click_2),
                 create_text("I'm a text too"),
+                create_image(),
             ]),
         ),
     )
@@ -142,7 +157,7 @@ fn root() -> Box<dyn Control> {
 fn main() {
     let mut application = imp::Application::get();
     
-    let mut window = application.new_window("plygui!!", WindowStartSize::Exact(200, 200), Menu::None);
+    let mut window = application.new_window("plygui!!", WindowStartSize::Exact(500, 500), Menu::None);
     window.on_size(Some(
         (|_: &mut dyn HasSize, w: u16, h: u16| {
             println!("win resized to {}/{}", w, h);
@@ -181,8 +196,8 @@ fn main() {
     ));
     window.set_child(Some(root()));
     
-    let tray = application.new_tray("Tray of Plygui", Menu::None);
-    let wi = application.new_window("guiply %)", WindowStartSize::Exact(100, 100), Menu::None);
+    //let tray = application.new_tray("Tray of Plygui", Menu::None);
+    //let wi = application.new_window("guiply %)", WindowStartSize::Exact(100, 100), Menu::None);
     
     application.start();
 
