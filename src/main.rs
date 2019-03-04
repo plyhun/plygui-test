@@ -157,7 +157,7 @@ fn root() -> Box<dyn Control> {
 fn main() {
     let mut application = imp::Application::get();
     
-    let mut window = application.new_window("plygui!!", WindowStartSize::Exact(500, 500), Menu::None);
+    let mut window = application.new_window("plygui!!", WindowStartSize::Exact(500, 500), None);
     window.on_size(Some(
         (|_: &mut dyn HasSize, w: u16, h: u16| {
             println!("win resized to {}/{}", w, h);
@@ -196,8 +196,8 @@ fn main() {
     ));
     window.set_child(Some(root()));
     
-    let tray = application.new_tray("Tray of Plygui", Menu::None);
-    let wi = application.new_window("guiply %)", WindowStartSize::Exact(100, 100), Menu::None);
+    let _tray = application.new_tray("Tray of Plygui", None);
+    let _wi = application.new_window("guiply %)", WindowStartSize::Exact(100, 100), None);
     
     application.start();
 
