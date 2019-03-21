@@ -196,22 +196,32 @@ fn main() {
     ));
     window.set_child(Some(root()));
     
-    let _tray = application.new_tray("Tray of Plygui", None);
+    let _tray = application.new_tray("Tray of Plygui", Some(vec![
+	    		MenuItem::Action(
+	    			"Exit".into(), 
+		    		(|m: &mut dyn Member| {
+		    				let application = imp::Application::get();
+		    				application.exit(true)
+		    			} 
+		    		).into(),
+                    MenuItemRole::Help,
+	    		)
+    		]));
     let _wi = application.new_window("guiply %)", WindowStartSize::Exact(400, 400), Some(vec![
 	    		MenuItem::Action(
-	    			"New".into(), 
+	    			"Help".into(), 
 		    		(|m: &mut dyn Member| {println!("Something new!"); true} ).into(),
-                    MenuItemRole::None,
+                    MenuItemRole::Help,
 	    		),
-	    		MenuItem::Delimiter,
 	    		MenuItem::Sub(
 	    			"Old".into(), 
 		    		vec![
 			    		MenuItem::Action(
 			    			"Older".into(), 
 				    		(|m: &mut dyn Member| {println!("Something old!"); true} ).into(),
-		                    MenuItemRole::None,
+		                    MenuItemRole::Options,
 			    		),
+			    		MenuItem::Delimiter,
 			    		MenuItem::Action(
 			    			"Oldest".into(), 
 				    		(|m: &mut dyn Member| {println!("Yikes!"); true} ).into(),
