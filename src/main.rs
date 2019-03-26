@@ -201,18 +201,24 @@ fn main() {
 	    			"Exit".into(), 
 		    		(|m: &mut dyn Member| {
 		    				let application = imp::Application::get();
-		    				application.exit(true)
+		    				application.exit(false)
 		    			} 
 		    		).into(),
                     MenuItemRole::Help,
 	    		)
     		]));
     let _wi = application.new_window("guiply %)", WindowStartSize::Exact(400, 400), Some(vec![
-	    		MenuItem::Action(
+                MenuItem::Sub(
 	    			"Help".into(), 
-		    		(|m: &mut dyn Member| {println!("Something new!"); true} ).into(),
+		    		vec![
+			    		MenuItem::Action(
+        	    			"About".into(), 
+        		    		(|m: &mut dyn Member| {println!("Plygui: Test"); true} ).into(),
+                            MenuItemRole::None,
+        	    		),
+		    		],
                     MenuItemRole::Help,
-	    		),
+	    		),	    		
 	    		MenuItem::Sub(
 	    			"Old".into(), 
 		    		vec![
