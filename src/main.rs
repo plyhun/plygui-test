@@ -205,6 +205,14 @@ fn main() {
 		    			} 
 		    		).into(),
                     MenuItemRole::Help,
+	    		),
+	    		MenuItem::Action(
+	    			"No tray please".into(), 
+		    		(|m: &mut dyn Member| {
+		    				m.as_any_mut().downcast_mut::<imp::Tray>().unwrap().close(true)
+		    			} 
+		    		).into(),
+                    MenuItemRole::Help,
 	    		)
     		]));
     let _wi = application.new_window("guiply %)", WindowStartSize::Exact(400, 400), Some(vec![
