@@ -2,6 +2,7 @@ use plygui::*;
 
 use std::fs::*;
 use std::io::BufReader;
+use std::sync::{Arc, RwLock};
 
 fn create_image() -> Box<Control> {
 	let img = external::image::load(BufReader::new(File::open("resources/lulz.png").unwrap()), external::image::PNG).unwrap();
@@ -75,7 +76,7 @@ fn create_vertical_layout(mut args: Vec<Box<dyn Control>>) -> Box<dyn Control> {
 fn button_click(b: &mut dyn Clickable) {
     let b = b.as_any_mut().downcast_mut::<imp::Button>().unwrap();
 
-    println!("button clicked: {}", b.label());
+    println!("button clicked: {} / {:?}", b.label(), b.id());
     //b.set_visibility(Visibility::Gone);
     //b.set_visibility(Visibility::Invisible);
 
@@ -154,10 +155,13 @@ fn root() -> Box<dyn Control> {
     )
 }
 
-pub fn exec() {
+pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>>) {
     let mut application = imp::Application::get();
     
     let mut window = application.new_window("plygui!!", WindowStartSize::Exact(800, 500), None);
+    
+    feeders.write().unwrap().push(window.on_frame_async_feeder());
+    
     window.on_size(Some(
         (|_: &mut dyn HasSize, w: u16, h: u16| {
             println!("win resized to {}/{}", w, h);
@@ -215,7 +219,7 @@ pub fn exec() {
                     MenuItemRole::Help,
 	    		)
     		]));
-    let _wi = application.new_window("guiply %)", WindowStartSize::Exact(400, 400), Some(vec![
+    let mut wi = application.new_window("guiply %)", WindowStartSize::Exact(400, 400), Some(vec![
                 MenuItem::Sub(
 	    			"Help".into(), 
 		    		vec![
@@ -245,6 +249,8 @@ pub fn exec() {
                     MenuItemRole::None,
 	    		),
     		]));
+    
+    feeders.write().unwrap().push(wi.on_frame_async_feeder());
     
     application.start();
 
