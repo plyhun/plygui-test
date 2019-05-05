@@ -34,7 +34,7 @@ fn create_splitted(first: Box<dyn Control>, second: Box<dyn Control>) -> Box<dyn
 
 fn create_button<F>(name: &str, f: F) -> Box<dyn Control>
 where
-    F: FnMut(&mut dyn Clickable) + 'static,
+    F: FnMut(&mut dyn Clickable) -> bool + 'static,
 {
     let mut button = imp::Button::with_label(name);
     button.set_layout_width(layout::Size::MatchParent);
@@ -43,6 +43,7 @@ where
     button.on_size(Some(
         (|_: &mut dyn HasSize, w: u16, h: u16| {
             println!("button resized too to {}/{}", w, h);
+            true
         })
         .into(),
     ));
@@ -54,6 +55,7 @@ fn create_vertical_layout(mut args: Vec<Box<dyn Control>>) -> Box<dyn Control> {
     vb.on_size(Some(
         (|_: &mut dyn HasSize, w: u16, h: u16| {
             println!("vb resized to {}/{}", w, h);
+            true
         })
         .into(),
     ));
@@ -73,7 +75,7 @@ fn create_vertical_layout(mut args: Vec<Box<dyn Control>>) -> Box<dyn Control> {
     vb.into_control()
 }
 
-fn button_click(b: &mut dyn Clickable) {
+fn button_click(b: &mut dyn Clickable) -> bool {
     let b = b.as_any_mut().downcast_mut::<imp::Button>().unwrap();
 
     println!("button clicked: {} / {:?}", b.label(), b.id());
@@ -113,6 +115,7 @@ fn button_click(b: &mut dyn Clickable) {
         parent.pop_child();
         let _ = imp::Message::with_content(TextContent::LabelDescription("Crap happened".into(), "We did all we could".into()), MessageSeverity::Alert, Some(parent.as_member())).start();
     }
+    true
 }
 
 fn root() -> Box<dyn Control> {
@@ -156,7 +159,7 @@ fn root() -> Box<dyn Control> {
 }
 
 pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>>) {
-    let mut application = imp::Application::get();
+    let mut application = imp::Application::get().unwrap();
     
     let mut window = application.new_window("plygui!!", WindowStartSize::Exact(800, 500), None);
     
@@ -165,11 +168,12 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
     window.on_size(Some(
         (|_: &mut dyn HasSize, w: u16, h: u16| {
             println!("win resized to {}/{}", w, h);
+            true
         })
         .into(),
     ));
     window.on_close(Some(
-        (|w: &mut dyn Member| {
+        (|w: &mut dyn Closeable| {
             let actions = vec![
                 (
                     "Okay".into(),
@@ -189,7 +193,7 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
                     .into(),
                 ),
             ];
-            if let Ok(answer) = imp::Message::start_with_actions(TextContent::LabelDescription("No close man".into(), "Srsly".into()), MessageSeverity::Warning, actions, Some(w)) {
+            if let Ok(answer) = imp::Message::start_with_actions(TextContent::LabelDescription("No close man".into(), "Srsly".into()), MessageSeverity::Warning, actions, Some(w.as_any_mut().downcast_mut::<imp::Window>().unwrap())) {
                 if answer == "Close I said!" {
                     return true;
                 }
@@ -204,7 +208,7 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
 	    		MenuItem::Action(
 	    			"Exit".into(), 
 		    		(|_m: &mut dyn Member| {
-		    				let application = imp::Application::get();
+		    				let application = imp::Application::get().unwrap();
 		    				application.exit(false)
 		    			} 
 		    		).into(),
