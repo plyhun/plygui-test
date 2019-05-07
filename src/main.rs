@@ -1,4 +1,4 @@
-use plygui::Window;
+use plygui::Application;
 
 use std::sync::{
     atomic::{AtomicBool, Ordering},
@@ -17,17 +17,19 @@ fn main() {
 
     thread::spawn(move || {
         while running.load(Ordering::SeqCst) {
-            thread::sleep(Duration::from_millis(5000));
+            thread::sleep(Duration::from_millis(2000));
 
-            if feeders2.write().unwrap().len() > 0 {
+            /*if feeders2.write().unwrap().len() > 0 {
                 let _ = feeders2.write().unwrap().remove(0).feed(
-                    (move |w: &mut dyn (Window)| {
-                        w.close(true);
+                    (move |w: &mut dyn Application| {
+                        w.exit(true);
                         false
                     })
                     .into(),
                 );
-            }
+            }*/
+            
+            println!("Still alive");
         }
     });
 

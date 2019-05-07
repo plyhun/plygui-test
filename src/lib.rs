@@ -161,9 +161,9 @@ fn root() -> Box<dyn Control> {
 pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>>) {
     let mut application = imp::Application::get().unwrap();
     
-    let mut window = application.new_window("plygui!!", WindowStartSize::Exact(800, 500), None);
+    feeders.write().unwrap().push(application.on_frame_async_feeder());
     
-    feeders.write().unwrap().push(window.on_frame_async_feeder());
+    let mut window = application.new_window("plygui!!", WindowStartSize::Exact(800, 500), None);
     
     window.on_size(Some(
         (|_: &mut dyn HasSize, w: u16, h: u16| {
@@ -223,7 +223,7 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
                     MenuItemRole::Help,
 	    		)
     		]));
-    let mut wi = application.new_window("guiply %)", WindowStartSize::Exact(400, 400), Some(vec![
+    let _wi = application.new_window("guiply %)", WindowStartSize::Exact(400, 400), Some(vec![
                 MenuItem::Sub(
 	    			"Help".into(), 
 		    		vec![
@@ -253,8 +253,6 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
                     MenuItemRole::None,
 	    		),
     		]));
-    
-    feeders.write().unwrap().push(wi.on_frame_async_feeder());
     
     application.start();
 
