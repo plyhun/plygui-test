@@ -1,4 +1,5 @@
-use plygui::Application;
+use plygui::{Application, Closeable};
+use plygui::imp::{Window, Tray};
 
 use std::sync::{
     atomic::{AtomicBool, Ordering},
@@ -19,15 +20,23 @@ fn main() {
         while running.load(Ordering::SeqCst) {
             thread::sleep(Duration::from_millis(2000));
 
-            /*if feeders2.write().unwrap().len() > 0 {
+            if feeders2.write().unwrap().len() > 0 {
                 let _ = feeders2.write().unwrap().remove(0).feed(
                     (move |w: &mut dyn Application| {
-                        w.exit(true);
+                        for m in w.members_mut() {
+                            if let Some(w) = m.as_any_mut().downcast_mut::<Window>() {
+                                w.close(true);
+                            } else if let Some(t) = m.as_any_mut().downcast_mut::<Tray>() {
+                                t.close(true);
+                            } else {
+                                println!("Unknown member type");
+                            }
+                        }
                         false
                     })
                     .into(),
                 );
-            }*/
+            }
             
             println!("Still alive");
         }
