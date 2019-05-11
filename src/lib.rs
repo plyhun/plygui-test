@@ -5,14 +5,14 @@ use std::io::BufReader;
 use std::sync::{Arc, RwLock};
 
 fn create_image() -> Box<Control> {
-	let img = external::image::load(BufReader::new(File::open("resources/lulz.png").unwrap()), external::image::PNG).unwrap();
-	
-	let mut i = imp::Image::with_content(img);
-	i.set_scale(ImageScalePolicy::CropCenter);
-	i.set_layout_width(layout::Size::MatchParent);
+    let img = external::image::load(BufReader::new(File::open("resources/lulz.png").unwrap()), external::image::PNG).unwrap();
+
+    let mut i = imp::Image::with_content(img);
+    i.set_scale(ImageScalePolicy::CropCenter);
+    i.set_layout_width(layout::Size::MatchParent);
     i.set_layout_height(layout::Size::WrapContent);
-    
-	i.into_control()
+
+    i.into_control()
 }
 fn create_frame(name: &str, child: Box<dyn Control>) -> Box<dyn Control> {
     let mut frame = imp::Frame::with_label(name);
@@ -124,13 +124,15 @@ fn root() -> Box<dyn Control> {
 
         println!("button clicked: {} / {:?}", b.label(), b.as_control().id());
         {
+            use plygui::FindBy as By;
+
             let id = b.id();
             let parent = b.parent_mut().unwrap();
             let parent_member_id = parent.as_any().type_id();
             println!("parent is {:?}", parent_member_id);
 
             let parent = parent.is_container_mut().unwrap();
-            println!("clicked is {:?}", parent.find_control_by_id(id).unwrap().as_any().type_id());
+            println!("clicked is {:?}", parent.find_control(By::Id(id)).unwrap().as_any().type_id());
 
             let parent = parent.is_multi_mut().unwrap();
             parent.child_at_mut(0).unwrap().set_visibility(Visibility::Visible);
@@ -160,11 +162,11 @@ fn root() -> Box<dyn Control> {
 
 pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>>) {
     let mut application = imp::Application::get().unwrap();
-    
+
     feeders.write().unwrap().push(application.on_frame_async_feeder());
-    
+
     let mut window = application.new_window("plygui!!", WindowStartSize::Exact(800, 500), None);
-    
+
     window.on_size(Some(
         (|_: &mut dyn HasSize, w: u16, h: u16| {
             println!("win resized to {}/{}", w, h);
@@ -193,7 +195,12 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
                     .into(),
                 ),
             ];
-            if let Ok(answer) = imp::Message::start_with_actions(TextContent::LabelDescription("No close man".into(), "Srsly".into()), MessageSeverity::Warning, actions, Some(w.as_any_mut().downcast_mut::<imp::Window>().unwrap())) {
+            if let Ok(answer) = imp::Message::start_with_actions(
+                TextContent::LabelDescription("No close man".into(), "Srsly".into()),
+                MessageSeverity::Warning,
+                actions,
+                Some(w.as_any_mut().downcast_mut::<imp::Window>().unwrap()),
+            ) {
                 if answer == "Close I said!" {
                     return true;
                 }
@@ -203,57 +210,67 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
         .into(),
     ));
     window.set_child(Some(root()));
-    
-    let _tray = application.new_tray("Tray of Plygui", Some(vec![
-	    		MenuItem::Action(
-	    			"Exit".into(), 
-		    		(|_m: &mut dyn Member| {
-		    				let application = imp::Application::get().unwrap();
-		    				application.exit(false)
-		    			} 
-		    		).into(),
-                    MenuItemRole::Help,
-	    		),
-	    		MenuItem::Action(
-	    			"No tray please".into(), 
-		    		(|m: &mut dyn Member| {
-		    				m.as_any_mut().downcast_mut::<imp::Tray>().unwrap().close(true)
-		    			} 
-		    		).into(),
-                    MenuItemRole::Help,
-	    		)
-    		]));
-    let _wi = application.new_window("guiply %)", WindowStartSize::Exact(400, 400), Some(vec![
-                MenuItem::Sub(
-	    			"Help".into(), 
-		    		vec![
-			    		MenuItem::Action(
-        	    			"About".into(), 
-        		    		(|_m: &mut dyn Member| {println!("Plygui: Test"); true} ).into(),
-                            MenuItemRole::None,
-        	    		),
-		    		],
-                    MenuItemRole::Help,
-	    		),	    		
-	    		MenuItem::Sub(
-	    			"Old".into(), 
-		    		vec![
-			    		MenuItem::Action(
-			    			"Older".into(), 
-				    		(|_m: &mut dyn Member| {println!("Something old!"); true} ).into(),
-		                    MenuItemRole::Options,
-			    		),
-			    		MenuItem::Delimiter,
-			    		MenuItem::Action(
-			    			"Oldest".into(), 
-				    		(|_m: &mut dyn Member| {println!("Yikes!"); true} ).into(),
-		                    MenuItemRole::None,
-			    		),
-		    		],
+
+    let _tray = application.new_tray(
+        "Tray of Plygui",
+        Some(vec![
+            MenuItem::Action(
+                "Exit".into(),
+                (|_m: &mut dyn Member| {
+                    let application = imp::Application::get().unwrap();
+                    application.exit(false)
+                })
+                .into(),
+                MenuItemRole::Help,
+            ),
+            MenuItem::Action("No tray please".into(), (|m: &mut dyn Member| m.as_any_mut().downcast_mut::<imp::Tray>().unwrap().close(true)).into(), MenuItemRole::Help),
+        ]),
+    );
+    let _wi = application.new_window(
+        "guiply %)",
+        WindowStartSize::Exact(400, 400),
+        Some(vec![
+            MenuItem::Sub(
+                "Help".into(),
+                vec![MenuItem::Action(
+                    "About".into(),
+                    (|_m: &mut dyn Member| {
+                        println!("Plygui: Test");
+                        true
+                    })
+                    .into(),
                     MenuItemRole::None,
-	    		),
-    		]));
-    
+                )],
+                MenuItemRole::Help,
+            ),
+            MenuItem::Sub(
+                "Old".into(),
+                vec![
+                    MenuItem::Action(
+                        "Older".into(),
+                        (|_m: &mut dyn Member| {
+                            println!("Something old!");
+                            true
+                        })
+                        .into(),
+                        MenuItemRole::Options,
+                    ),
+                    MenuItem::Delimiter,
+                    MenuItem::Action(
+                        "Oldest".into(),
+                        (|_m: &mut dyn Member| {
+                            println!("Yikes!");
+                            true
+                        })
+                        .into(),
+                        MenuItemRole::None,
+                    ),
+                ],
+                MenuItemRole::None,
+            ),
+        ]),
+    );
+
     application.start();
 
     println!("Exiting");

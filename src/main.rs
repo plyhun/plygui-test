@@ -1,5 +1,5 @@
+use plygui::imp::{Tray, Window};
 use plygui::{Application, Closeable};
-use plygui::imp::{Window, Tray};
 
 use std::sync::{
     atomic::{AtomicBool, Ordering},
@@ -37,7 +37,7 @@ fn main() {
                     .into(),
                 );
             }
-            
+
             println!("Still alive");
         }
     });
