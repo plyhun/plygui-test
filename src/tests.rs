@@ -22,11 +22,11 @@ fn close_after_5_secs() {
 
     thread::spawn(move || {
         while running.load(Ordering::SeqCst) {
+            thread::sleep(Duration::from_millis(5000));
+            
             if feeders2.write().unwrap().len() > 0 {
                 let _ = feeders2.write().unwrap()[0].feed(
                     (move |w: &mut dyn Application| {
-                        thread::sleep(Duration::from_millis(5000));
-                
                         if let Some(m) = w.members_mut().next() {
                             if let Some(w) = m.as_any_mut().downcast_mut::<Window>() {
                                 w.close(true);
@@ -35,10 +35,8 @@ fn close_after_5_secs() {
                             } else {
                                 println!("Unknown member type");
                             }
-                            true
-                        } else {   
-                            false
-                        }
+                        } 
+                        false
                     })
                     .into(),
                 );
