@@ -16,6 +16,11 @@ long_description = """
 An application with a demonstration of random features of Plygui framework.
 """
 
+[[test]]
+name = "tests"
+path = "src/tests.rs"
+harness = false
+
 [lib]
 name = "plygui_test"
 path = "src/lib.rs"
