@@ -3,6 +3,7 @@ use plygui::*;
 use std::fs::*;
 use std::io::BufReader;
 use std::sync::{Arc, RwLock};
+use std::borrow::Cow;
 
 fn create_image() -> Box<Control> {
     let img = external::image::load(BufReader::new(File::open("resources/lulz.png").unwrap()), external::image::PNG).unwrap();
@@ -32,9 +33,10 @@ fn create_splitted(first: Box<dyn Control>, second: Box<dyn Control>) -> Box<dyn
     splitted.into_control()
 }
 
-fn create_button<F>(name: &str, f: F) -> Box<dyn Control>
+fn create_button<'a, F, S>(name: &str, f: F, tag: Option<S>) -> Box<dyn Control>
 where
     F: FnMut(&mut dyn Clickable) -> bool + 'static,
+    S: Into<Cow<'a, str>>
 {
     let mut button = imp::Button::with_label(name);
     button.set_layout_width(layout::Size::MatchParent);
@@ -47,6 +49,7 @@ where
         })
         .into(),
     ));
+    button.set_tag(tag.map(|tag|tag.into()));
     button.into_control()
 }
 
@@ -115,11 +118,12 @@ fn button_click(b: &mut dyn Clickable) -> bool {
         parent.pop_child();
         let _ = imp::Message::with_content(TextContent::LabelDescription("Crap happened".into(), "We did all we could".into()), MessageSeverity::Alert, Some(parent.as_member())).start();
     }
+    
     true
 }
 
 fn root() -> Box<dyn Control> {
-    let _click_2 = |b: &mut dyn Clickable| {
+    let click_2 = |b: &mut dyn Clickable| {
         let b = b.as_any_mut().downcast_mut::<imp::Button>().unwrap();
 
         println!("button clicked: {} / {:?}", b.label(), b.as_control().id());
@@ -136,25 +140,30 @@ fn root() -> Box<dyn Control> {
 
             let parent = parent.is_multi_mut().unwrap();
             parent.child_at_mut(0).unwrap().set_visibility(Visibility::Visible);
+            
+            if let Some(member) = parent.find_control_mut(By::Tag("tagg".into())) {
+                println!("clicked = {}",member.as_any_mut().downcast_mut::<imp::Button>().unwrap().click(false));
+            }
         }
+        true
     };
     create_splitted(
         create_frame(
             "Frame #1",
             create_vertical_layout(vec![
-                create_button("Button #1", button_click),
-                //create_button("Button #2", click_2),
+                create_button("Button #1", button_click, Some("tagg")),
+                create_button("Button #2", click_2, Option::<String>::None),
                 create_text("I am text"),
-                create_image(),
+                //create_image(),
             ]),
         ),
         create_frame(
             "Frame #2",
             create_vertical_layout(vec![
-                create_button("Button #1", button_click),
-                //create_button("Button #2", click_2),
+                create_button("Button #1", button_click, Option::<String>::None),
+                create_button("Button #2", click_2, Option::<String>::None),
                 create_text("I'm a text too"),
-                create_image(),
+                //create_image(),
             ]),
         ),
     )
