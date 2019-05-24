@@ -217,7 +217,7 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
     ));
     window.set_child(Some(root()));
 
-    let _tray = application.new_tray(
+    let mut tray = application.new_tray(
         "Tray of Plygui",
         Some(vec![
             MenuItem::Action(
@@ -232,6 +232,9 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
             MenuItem::Action("No tray please".into(), (|m: &mut dyn Member| m.as_any_mut().downcast_mut::<imp::Tray>().unwrap().close(true)).into(), MenuItemRole::Help),
         ]),
     );
+    tray.set_image(Cow::Owned(external::image::load_from_memory(include_bytes!("../resources/icon256x256.png")).unwrap()));
+    
+    
     let _wi = application.new_window(
         "guiply %)",
         WindowStartSize::Exact(400, 400),
