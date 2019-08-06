@@ -30,16 +30,16 @@ name = "uitest"
 path = "src/main.rs"
 
 [target.'cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "openbsd"))'.dependencies]
-plygui = {version = "0.0.1", path = "../plygui-api/lib", features = ["gtk3"]}
+plygui = {version = "0.0.1", path = "../plygui/lib", features = ["gtk3"]}
 
 [target.'cfg(target_os = "windows")'.dependencies]
-plygui = {version = "0.0.1", path = "../plygui-api/lib", features = ["win32"]}
+plygui = {version = "0.0.1", path = "../plygui/lib", features = ["win32"]}
 
 [target.'cfg(target_os = "macos")'.dependencies]
-plygui = {version = "0.0.1", path = "../plygui-api/lib", features = ["cocoa"]}
+plygui = {version = "0.0.1", path = "../plygui/lib", features = ["cocoa"]}
 
 #[dependencies]
-#plygui = {version = "0.0.1", path = "../plygui-api/testable", package = "plygui-testable"}
+#plygui = {version = "0.0.1", path = "../plygui/testable", package = "plygui-testable"}
 
 #[dependencies]
 #plygui = {version = "0.0.1", path = "../plygui-qt", package = "plygui-qt"}
