@@ -5,15 +5,16 @@ use std::io::BufReader;
 use std::sync::{Arc, RwLock};
 use std::borrow::Cow;
 
-fn create_image() -> Box<Control> {
+fn create_image() -> Box<dyn Control> {
     let img = external::image::load(BufReader::new(File::open("resources/lulz.png").unwrap()), external::image::PNG).unwrap();
 
     let mut i = imp::Image::with_content(img);
     i.set_scale(ImageScalePolicy::CropCenter);
-    i.set_layout_width(layout::Size::MatchParent);
-    i.set_layout_height(layout::Size::WrapContent);
-
+    
     i.into_control()
+}
+fn create_progress_bar(progress: Progress) -> Box<dyn Control> {
+	imp::ProgressBar::with_progress(progress).into_control()
 }
 fn create_frame(name: &str, child: Box<dyn Control>) -> Box<dyn Control> {
     let mut frame = imp::Frame::with_label(name);
@@ -22,15 +23,11 @@ fn create_frame(name: &str, child: Box<dyn Control>) -> Box<dyn Control> {
 }
 
 fn create_text(text: &str) -> Box<dyn Control> {
-    let text = imp::Text::with_text(text);
-    text.into_control()
+    imp::Text::with_text(text).into_control()
 }
 
-fn create_splitted(first: Box<dyn Control>, second: Box<dyn Control>) -> Box<dyn Control> {
-    let mut splitted = imp::Splitted::with_content(first, second, layout::Orientation::Horizontal);
-    splitted.set_layout_width(layout::Size::MatchParent);
-    splitted.set_layout_height(layout::Size::WrapContent);
-    splitted.into_control()
+fn create_splitted(o: layout::Orientation, first: Box<dyn Control>, second: Box<dyn Control>) -> Box<dyn Control> {
+    imp::Splitted::with_content(first, second, o).into_control()
 }
 
 fn create_button<'a, F, S>(name: &str, f: F, tag: Option<S>) -> Box<dyn Control>
@@ -39,8 +36,6 @@ where
     S: Into<Cow<'a, str>>
 {
     let mut button = imp::Button::with_label(name);
-    button.set_layout_width(layout::Size::MatchParent);
-    button.set_layout_height(layout::Size::WrapContent);
     button.on_click(Some(f.into()));
     button.on_size(Some(
         (|_: &mut dyn HasSize, w: u16, h: u16| {
@@ -145,6 +140,7 @@ fn root() -> Box<dyn Control> {
         }
     };
     create_splitted(
+    	layout::Orientation::Horizontal,
         create_frame(
             "Frame #1",
             create_vertical_layout(vec![
@@ -164,6 +160,14 @@ fn root() -> Box<dyn Control> {
             ]),
         ),
     )
+}
+
+fn root2() -> Box<dyn Control> {
+	create_splitted(
+		layout::Orientation::Vertical, 
+		create_progress_bar(Progress::Value(35, 100)),
+		create_image(), 
+	)
 }
 
 pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>>) {
@@ -232,10 +236,10 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
             MenuItem::Action("No tray please".into(), (|m: &mut dyn Member| m.as_any_mut().downcast_mut::<imp::Tray>().unwrap().close(true)).into(), MenuItemRole::Help),
         ]),
     );
-    tray.set_image(Cow::Owned(external::image::load_from_memory(include_bytes!("../resources/icon256x256.png")).unwrap()));
+    tray.set_image(Cow::Owned(external::image::load_from_memory(include_bytes!("../resources/icon512x512.png")).unwrap()));
     
     
-    let _wi = application.new_window(
+    let mut wi = application.new_window(
         "guiply %)",
         WindowStartSize::Exact(400, 400),
         Some(vec![
@@ -279,6 +283,8 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
             ),
         ]),
     );
+    
+    wi.set_child(Some(root2()));
 
     application.start();
 
