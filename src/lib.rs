@@ -5,11 +5,18 @@ use std::io::BufReader;
 use std::sync::{Arc, RwLock};
 use std::borrow::Cow;
 
-fn create_image() -> Box<dyn Control> {
+fn create_list() -> Box<dyn Control> {
+    let adapter = Box::new(common::SimpleTextAdapter::with_into_iterator(&["One", "Two", "Three"]));
+    let mut list = imp::List::with_adapter(adapter).into_control();
+    list.set_layout_height(layout::Size::MatchParent);
+    list
+}
+
+fn create_image(policy: ImageScalePolicy) -> Box<dyn Control> {
     let img = external::image::load(BufReader::new(File::open("resources/lulz.png").unwrap()), external::image::PNG).unwrap();
 
     let mut i = imp::Image::with_content(img);
-    i.set_scale(ImageScalePolicy::CropCenter);
+    i.set_scale(policy);
     
     i.into_control()
 }
@@ -57,17 +64,7 @@ fn create_vertical_layout(mut args: Vec<Box<dyn Control>>) -> Box<dyn Control> {
         })
         .into(),
     ));
-    for mut arg in args.drain(..) {
-        match vb.layout_orientation() {
-            layout::Orientation::Horizontal => {
-                arg.set_layout_width(layout::Size::WrapContent);
-                arg.set_layout_height(layout::Size::MatchParent);
-            }
-            layout::Orientation::Vertical => {
-                arg.set_layout_width(layout::Size::MatchParent);
-                arg.set_layout_height(layout::Size::WrapContent);
-            }
-        }
+    for arg in args.drain(..) {
         vb.push_child(arg);
     }
     vb.into_control()
@@ -147,7 +144,8 @@ fn root() -> Box<dyn Control> {
                 create_button("Button #1", button_click, Some("tagg")),
                 create_button("Button #2", click_2, Option::<String>::None),
                 create_text("I am text"),
-                //create_image(),
+                //create_table(),
+                create_image(ImageScalePolicy::FitCenter),
             ]),
         ),
         create_frame(
@@ -156,6 +154,7 @@ fn root() -> Box<dyn Control> {
                 create_button("Button #1", button_click, Option::<String>::None),
                 create_button("Button #2", click_2, Option::<String>::None),
                 create_text("I'm a text too"),
+                create_list(),
                 //create_image(),
             ]),
         ),
@@ -163,11 +162,13 @@ fn root() -> Box<dyn Control> {
 }
 
 fn root2() -> Box<dyn Control> {
-	create_splitted(
-		layout::Orientation::Vertical, 
+	let mut s = create_splitted(
+		layout::Orientation::Horizontal, 
 		create_progress_bar(Progress::Value(35, 100)),
-		create_image(), 
-	)
+		create_image(ImageScalePolicy::CropCenter), 
+	);
+	s.set_layout_height(layout::Size::MatchParent);
+	s
 }
 
 pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>>) {
@@ -236,8 +237,7 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
             MenuItem::Action("No tray please".into(), (|m: &mut dyn Member| m.as_any_mut().downcast_mut::<imp::Tray>().unwrap().close(true)).into(), MenuItemRole::Help),
         ]),
     );
-    tray.set_image(Cow::Owned(external::image::load_from_memory(include_bytes!("../resources/icon512x512.png")).unwrap()));
-    
+    tray.set_image(Cow::Owned(external::image::load_from_memory(include_bytes!("../resources/icon128x128.png")).unwrap()));
     
     let mut wi = application.new_window(
         "guiply %)",
