@@ -6,10 +6,17 @@ use std::sync::{Arc, RwLock};
 use std::borrow::Cow;
 
 fn create_list() -> Box<dyn Control> {
-    let adapter = Box::new(common::SimpleTextAdapter::with_into_iterator(&["One", "Two", "Three"]));
-    let mut list = imp::List::with_adapter(adapter).into_control();
+    let adapter = Box::new(common::SimpleTextAdapter::with_into_iterator(&["1", "2", "3","4", "5", "6","7", "8", "9","10", "11", "12","13", "14", "15","16", "17", "18","19", "20", "21","22", "23", "24","25", "26", "27","28", "29", "30",]));
+    let mut list = imp::List::with_adapter(adapter);
     list.set_layout_height(layout::Size::MatchParent);
-    list
+    list.on_item_click(Some(
+        (|p: &mut dyn ItemClickable, i: usize, item_view: &mut dyn Control| {
+            item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().set_label(format!("clicked {}", i).into());
+            p.as_any_mut().downcast_mut::<imp::List>().unwrap().adapter_mut().as_any_mut().downcast_mut::<common::SimpleTextAdapter>().unwrap().push("More clicked");
+        })
+        .into(),
+    ));
+    list.into_control()
 }
 
 fn create_image(policy: ImageScalePolicy) -> Box<dyn Control> {
@@ -64,6 +71,7 @@ fn create_vertical_layout(mut args: Vec<Box<dyn Control>>) -> Box<dyn Control> {
         })
         .into(),
     ));
+    vb.set_layout_height(layout::Size::MatchParent);
     for arg in args.drain(..) {
         vb.push_child(arg);
     }
@@ -79,7 +87,7 @@ fn button_click(b: &mut dyn Clickable) {
 
     let parent = b.is_control_mut().unwrap().parent_mut().unwrap().is_container_mut().unwrap().is_multi_mut().unwrap();
 
-    if parent.len() < 4 {
+    if parent.len() < 5 {
         println!("add child");
         parent.push_child(root());
         let _ = imp::Message::start_with_actions(
@@ -136,7 +144,7 @@ fn root() -> Box<dyn Control> {
             }
         }
     };
-    create_splitted(
+    let mut s = create_splitted(
     	layout::Orientation::Horizontal,
         create_frame(
             "Frame #1",
@@ -158,7 +166,10 @@ fn root() -> Box<dyn Control> {
                 //create_image(),
             ]),
         ),
-    )
+    );
+    s.set_layout_width(layout::Size::MatchParent);
+	s.set_layout_height(layout::Size::MatchParent);
+	s
 }
 
 fn root2() -> Box<dyn Control> {
@@ -167,6 +178,7 @@ fn root2() -> Box<dyn Control> {
 		create_progress_bar(Progress::Value(35, 100)),
 		create_image(ImageScalePolicy::CropCenter), 
 	);
+	s.set_layout_width(layout::Size::MatchParent);
 	s.set_layout_height(layout::Size::MatchParent);
 	s
 }
