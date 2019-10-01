@@ -21,10 +21,9 @@ fn create_list() -> Box<dyn Control> {
 
 fn create_image(policy: ImageScalePolicy) -> Box<dyn Control> {
     let img = external::image::load(BufReader::new(File::open("resources/lulz.png").unwrap()), external::image::PNG).unwrap();
-
     let mut i = imp::Image::with_content(img);
     i.set_scale(policy);
-    
+    i.set_layout_height(layout::Size::MatchParent);
     i.into_control()
 }
 fn create_progress_bar(progress: Progress) -> Box<dyn Control> {
@@ -41,7 +40,9 @@ fn create_text(text: &str) -> Box<dyn Control> {
 }
 
 fn create_splitted(o: layout::Orientation, first: Box<dyn Control>, second: Box<dyn Control>) -> Box<dyn Control> {
-    imp::Splitted::with_content(first, second, o).into_control()
+    let mut s = imp::Splitted::with_content(first, second, o).into_control();
+    s.set_layout_height(layout::Size::MatchParent);
+    s
 }
 
 fn create_button<'a, F, S>(name: &str, f: F, tag: Option<S>) -> Box<dyn Control>
@@ -87,7 +88,7 @@ fn button_click(b: &mut dyn Clickable) {
 
     let parent = b.is_control_mut().unwrap().parent_mut().unwrap().is_container_mut().unwrap().is_multi_mut().unwrap();
 
-    if parent.len() < 5 {
+    if parent.len() < 4 {
         println!("add child");
         parent.push_child(root());
         let _ = imp::Message::start_with_actions(
