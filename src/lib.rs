@@ -6,13 +6,18 @@ use std::sync::{Arc, RwLock};
 use std::borrow::Cow;
 
 fn create_list() -> Box<dyn Control> {
-    let adapter = Box::new(common::SimpleTextAdapter::with_into_iterator(&["1", "2", "3","4", "5", "6","7", "8", "9","10", "11", "12","13", "14", "15","16", "17", "18","19", "20", "21","22", "23", "24","25", "26", "27","28", "29", "30",]));
+    let adapter = Box::new(common::SimpleTextAdapter::with_into_iterator(&["1"]));
     let mut list = imp::List::with_adapter(adapter);
     list.set_layout_height(layout::Size::MatchParent);
     list.on_item_click(Some(
         (|p: &mut dyn ItemClickable, i: usize, item_view: &mut dyn Control| {
             item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().set_label(format!("clicked {}", i).into());
-            p.as_any_mut().downcast_mut::<imp::List>().unwrap().adapter_mut().as_any_mut().downcast_mut::<common::SimpleTextAdapter>().unwrap().push("More clicked");
+            let adapter = p.as_any_mut().downcast_mut::<imp::List>().unwrap().adapter_mut().as_any_mut().downcast_mut::<common::SimpleTextAdapter>().unwrap();
+            if (i % 2) > 0 {
+               adapter.pop();
+            } else {
+                adapter.push(format!("More clicked {}", i.to_string())); 
+            }
         })
         .into(),
     ));
