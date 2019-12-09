@@ -39,7 +39,7 @@ plygui = {version = "0.0.1", path = "../plygui/lib", features = ["win32"]}
 plygui = {version = "0.0.1", path = "../plygui/lib", features = ["cocoa"]}
 
 #[dependencies]
-#plygui = {version = "0.0.1", path = "../plygui/testable", package = "plygui-testable"}
+#plygui = {version = "0.0.1", path = "../plygui/lib"}
 
 #[dependencies]
 #plygui = {version = "0.0.1", path = "../plygui-qt", package = "plygui-qt"}
