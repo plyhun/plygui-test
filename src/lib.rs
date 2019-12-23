@@ -91,7 +91,7 @@ fn button_click(b: &mut dyn Clickable) {
     //b.set_visibility(Visibility::Gone);
     //b.set_visibility(Visibility::Invisible);
 
-    let parent = b.is_control_mut().unwrap().parent_mut().unwrap().is_container_mut().unwrap().is_multi_mut().unwrap();
+    let parent = b.is_control_mut().unwrap().parent_mut().unwrap().is_container_mut().unwrap().is_multi_container_mut().unwrap();
 
     if parent.len() < 4 {
         println!("add child");
@@ -142,7 +142,7 @@ fn root() -> Box<dyn Control> {
             let parent = parent.is_container_mut().unwrap();
             println!("clicked is {:?}", parent.find_control(By::Id(id)).unwrap().as_any().type_id());
 
-            let parent = parent.is_multi_mut().unwrap();
+            let parent = parent.is_multi_container_mut().unwrap();
             parent.child_at_mut(0).unwrap().set_visibility(Visibility::Visible);
             
             if let Some(member) = parent.find_control_mut(By::Tag("tagg".into())) {

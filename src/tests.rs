@@ -1,7 +1,6 @@
 mod lib;
 
-use plygui::imp::{Tray, Window};
-use plygui::{Application, Closeable};
+use plygui::{Application};
 
 use std::sync::{
     atomic::{AtomicBool, Ordering},
@@ -28,12 +27,8 @@ fn close_after_5_secs() {
                 let _ = feeders2.write().unwrap()[0].feed(
                     (move |w: &mut dyn Application| {
                         if let Some(m) = w.members_mut().next() {
-                            if let Some(w) = m.as_any_mut().downcast_mut::<Window>() {
-                                w.close(true);
-                            } else if let Some(t) = m.as_any_mut().downcast_mut::<Tray>() {
-                                t.close(true);
-                            } else {
-                                println!("Unknown member type");
+                            if let Some(c) = m.is_closeable_mut() {
+                                c.close(true);
                             }
                         } 
                         false
