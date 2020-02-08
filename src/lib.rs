@@ -1,4 +1,5 @@
 use plygui::*;
+//use plygui::common_api as common;
 
 use std::fs::*;
 use std::io::BufReader;
@@ -181,7 +182,7 @@ fn root() -> Box<dyn Control> {
 fn root2() -> Box<dyn Control> {
 	let mut s = create_splitted(
 		layout::Orientation::Horizontal, 
-		create_progress_bar(Progress::Value(35, 100)),
+		create_progress_bar(Progress::Value(85, 100)),
 		create_image(ImageScalePolicy::CropCenter), 
 	);
 	s.set_layout_width(layout::Size::MatchParent);
