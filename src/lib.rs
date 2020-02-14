@@ -26,7 +26,7 @@ fn create_list() -> Box<dyn Control> {
 }
 
 fn create_image(policy: ImageScalePolicy) -> Box<dyn Control> {
-    let img = external::image::load(BufReader::new(File::open("resources/lulz.png").unwrap()), external::image::PNG).unwrap();
+    let img = external::image::load(BufReader::new(File::open("resources/lulz.png").unwrap()), external::image::ImageFormat::Png).unwrap();
     let mut i = imp::Image::with_content(img);
     i.set_scale(policy);
     i.set_layout_height(layout::Size::MatchParent);
@@ -159,7 +159,7 @@ fn root() -> Box<dyn Control> {
                 create_button("Button #1", button_click, Some("tagg")),
                 create_button("Button #2", click_2, Option::<String>::None),
                 create_text("I am text"),
-                //create_table(),
+                create_list(),
                 create_image(ImageScalePolicy::FitCenter),
             ]),
         ),
@@ -183,6 +183,7 @@ fn root2() -> Box<dyn Control> {
 	let mut s = create_splitted(
 		layout::Orientation::Horizontal, 
 		create_progress_bar(Progress::Value(85, 100)),
+		//create_progress_bar(Progress::Value(15, 100)),
 		create_image(ImageScalePolicy::CropCenter), 
 	);
 	s.set_layout_width(layout::Size::MatchParent);
