@@ -159,7 +159,7 @@ fn root() -> Box<dyn Control> {
                 create_button("Button #1", button_click, Some("tagg")),
                 create_button("Button #2", click_2, Option::<String>::None),
                 create_text("I am text"),
-                create_list(),
+                //create_list(),
                 create_image(ImageScalePolicy::FitCenter),
             ]),
         ),
