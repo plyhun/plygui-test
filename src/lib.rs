@@ -1,5 +1,4 @@
 use plygui::*;
-//use plygui::common_api as common;
 
 use std::fs::*;
 use std::io::BufReader;
@@ -92,7 +91,7 @@ fn button_click(b: &mut dyn Clickable) {
     //b.set_visibility(Visibility::Gone);
     //b.set_visibility(Visibility::Invisible);
 
-    let parent = b.is_control_mut().unwrap().parent_mut().unwrap().is_container_mut().unwrap().is_multi_container_mut().unwrap();
+    let parent = b.parent_mut().unwrap().is_container_mut().unwrap().is_multi_container_mut().unwrap();
 
     if parent.len() < 4 {
         println!("add child");
@@ -159,7 +158,7 @@ fn root() -> Box<dyn Control> {
                 create_button("Button #1", button_click, Some("tagg")),
                 create_button("Button #2", click_2, Option::<String>::None),
                 create_text("I am text"),
-                //create_list(),
+                //create_table(),
                 create_image(ImageScalePolicy::FitCenter),
             ]),
         ),
@@ -182,8 +181,7 @@ fn root() -> Box<dyn Control> {
 fn root2() -> Box<dyn Control> {
 	let mut s = create_splitted(
 		layout::Orientation::Horizontal, 
-		create_progress_bar(Progress::Value(85, 100)),
-		//create_progress_bar(Progress::Value(15, 100)),
+		create_progress_bar(Progress::Value(35, 100)),
 		create_image(ImageScalePolicy::CropCenter), 
 	);
 	s.set_layout_width(layout::Size::MatchParent);
@@ -196,7 +194,7 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
 
     feeders.write().unwrap().push(application.on_frame_async_feeder());
 
-    let mut window = application.new_window("plygui!!", WindowStartSize::Exact(800, 500), None);
+    let mut window = imp::Window::with_params("plygui!!", WindowStartSize::Exact(800, 500), None);
 
     window.on_size(Some(
         (|_: &mut dyn HasSize, w: u16, h: u16| {
@@ -242,8 +240,9 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
     ));
     window.set_child(Some(root()));
 
-    let mut tray = application.new_tray(
+    let _tray = imp::Tray::with_params(
         "Tray of Plygui",
+        external::image::load_from_memory(include_bytes!("../resources/icon128x128.png")).unwrap(),
         Some(vec![
             MenuItem::Action(
                 "Exit".into(),
@@ -257,9 +256,7 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
             MenuItem::Action("No tray please".into(), (|m: &mut dyn Member| m.as_any_mut().downcast_mut::<imp::Tray>().unwrap().close(true)).into(), MenuItemRole::Help),
         ]),
     );
-    tray.set_image(Cow::Owned(external::image::load_from_memory(include_bytes!("../resources/icon128x128.png")).unwrap()));
-    
-    let mut wi = application.new_window(
+    let mut wi = imp::Window::with_params(
         "guiply %)",
         WindowStartSize::Exact(400, 400),
         Some(vec![
