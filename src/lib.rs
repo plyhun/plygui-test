@@ -190,73 +190,78 @@ fn root2() -> Box<dyn Control> {
 }
 
 pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>>) {
-    let mut application = imp::Application::get().unwrap();
+    let mut application = imp::Application::with_name("plygui");
 
     feeders.write().unwrap().push(application.on_frame_async_feeder());
 
-    let mut window = imp::Window::with_params("plygui!!", WindowStartSize::Exact(800, 500), None);
-
-    window.on_size(Some(
-        (|_: &mut dyn HasSize, w: u16, h: u16| {
-            println!("win resized to {}/{}", w, h);
-            true
-        })
-        .into(),
-    ));
-    window.on_close(Some(
-        (|w: &mut dyn Closeable| {
-            let actions = vec![
-                (
-                    "Okay".into(),
-                    (|m: &mut dyn Member| {
-                        let _ = imp::Message::start_with_actions(TextContent::LabelDescription("Good boi".into(), "Keep working".into()), MessageSeverity::Info, vec![], Some(m));
-                        true
-                    })
-                    .into(),
-                ),
-                (
-                    "Close I said!".into(),
-                    (|m: &mut dyn Member| {
-                        println!("{:?} closed", m.id());
-
-                        false
-                    })
-                    .into(),
-                ),
-            ];
-            if let Ok(answer) = imp::Message::start_with_actions(
-                TextContent::LabelDescription("No close man".into(), "Srsly".into()),
-                MessageSeverity::Warning,
-                actions,
-                Some(w.as_any_mut().downcast_mut::<imp::Window>().unwrap()),
-            ) {
-                if answer == "Close I said!" {
-                    return true;
+    let window = application.new_window::<imp::Window>("plygui!!", WindowStartSize::Exact(800, 500), None);
+    {
+        let window = application.find_member_mut(FindBy::Id(window)).unwrap().as_any_mut().downcast_mut::<imp::Window>().unwrap();
+        window.on_size(Some(
+            (|_: &mut dyn HasSize, w: u16, h: u16| {
+                println!("win resized to {}/{}", w, h);
+                true
+            })
+            .into(),
+        ));
+        window.on_close(Some(
+            (|w: &mut dyn Closeable| {
+                let actions = vec![
+                    (
+                        "Okay".into(),
+                        (|m: &mut dyn Member| {
+                            let _ = imp::Message::start_with_actions(TextContent::LabelDescription("Good boi".into(), "Keep working".into()), MessageSeverity::Info, vec![], Some(m));
+                            true
+                        })
+                        .into(),
+                    ),
+                    (
+                        "Close I said!".into(),
+                        (|m: &mut dyn Member| {
+                            println!("{:?} closed", m.id());
+    
+                            false
+                        })
+                        .into(),
+                    ),
+                ];
+                if let Ok(answer) = imp::Message::start_with_actions(
+                    TextContent::LabelDescription("No close man".into(), "Srsly".into()),
+                    MessageSeverity::Warning,
+                    actions,
+                    Some(w.as_any_mut().downcast_mut::<imp::Window>().unwrap()),
+                ) {
+                    if answer == "Close I said!" {
+                        return true;
+                    }
                 }
-            }
-            false
-        })
-        .into(),
-    ));
-    window.set_child(Some(root()));
+                false
+            })
+            .into(),
+        ));
+        window.set_child(Some(root()));
+    }
 
-    let _tray = imp::Tray::with_params(
+    let tray = application.new_tray::<imp::Tray>(
         "Tray of Plygui",
         external::image::load_from_memory(include_bytes!("../resources/icon128x128.png")).unwrap(),
         Some(vec![
             MenuItem::Action(
                 "Exit".into(),
-                (|_m: &mut dyn Member| {
-                    let application = imp::Application::get().unwrap();
-                    application.exit(false)
+                (|m: &mut dyn Member| {
+                    let application = m.as_any_mut().downcast_mut::<imp::Tray>().unwrap().application_mut();
+                    false //application.exit()                    
                 })
                 .into(),
                 MenuItemRole::Help,
             ),
-            MenuItem::Action("No tray please".into(), (|m: &mut dyn Member| m.as_any_mut().downcast_mut::<imp::Tray>().unwrap().close(true)).into(), MenuItemRole::Help),
+            MenuItem::Action("No tray please".into(), (|m: &mut dyn Member| {
+                        let id = m.id();
+                        m.as_any_mut().downcast_mut::<imp::Tray>().unwrap().application_mut().close_root(FindBy::Id(id), true)
+                }).into(), MenuItemRole::Help),
         ]),
     );
-    let mut wi = imp::Window::with_params(
+    let wi = application.new_window::<imp::Window>(
         "guiply %)",
         WindowStartSize::Exact(400, 400),
         Some(vec![
@@ -301,7 +306,10 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
         ]),
     );
     
-    wi.set_child(Some(root2()));
+    {
+        let wi = application.find_member_mut(FindBy::Id(wi)).unwrap().as_any_mut().downcast_mut::<imp::Window>().unwrap();
+        wi.set_child(Some(root2()));
+    }
 
     application.start();
 
