@@ -1,6 +1,6 @@
 mod lib;
 
-use plygui::{Application};
+use plygui::{Application, FindBy};
 
 use std::sync::{
     atomic::{AtomicBool, Ordering},
@@ -26,11 +26,10 @@ fn close_after_5_secs() {
             if feeders2.write().unwrap().len() > 0 {
                 let _ = feeders2.write().unwrap()[0].feed(
                     (move |w: &mut dyn Application| {
-                        if let Some(m) = w.members_mut().next() {
-                            if let Some(c) = m.is_closeable_mut() {
-                                c.close(true);
-                            }
-                        } 
+                        let id = w.roots_mut().next().map(|r| r.id());
+                        if let Some(id) = id {
+                            w.close_root(FindBy::Id(id), true);
+                        }
                         false
                     })
                     .into(),
