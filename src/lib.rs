@@ -242,7 +242,7 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
         window.set_child(Some(root()));
     }
 
-    let tray = application.new_tray::<imp::Tray>(
+    let _tray = application.new_tray::<imp::Tray>(
         "Tray of Plygui",
         external::image::load_from_memory(include_bytes!("../resources/icon128x128.png")).unwrap(),
         Some(vec![
@@ -250,7 +250,8 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
                 "Exit".into(),
                 (|m: &mut dyn Member| {
                     let application = m.as_any_mut().downcast_mut::<imp::Tray>().unwrap().application_mut();
-                    false //application.exit()                    
+                    application.prepare_exit();
+                    true                  
                 })
                 .into(),
                 MenuItemRole::Help,
