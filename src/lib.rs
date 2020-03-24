@@ -1,9 +1,10 @@
+//use plygui::common_api as common;
 use plygui::*;
 
+use std::borrow::Cow;
 use std::fs::*;
 use std::io::BufReader;
 use std::sync::{Arc, RwLock};
-use std::borrow::Cow;
 
 fn create_list() -> Box<dyn Control> {
     let adapter = Box::new(common::SimpleTextAdapter::with_into_iterator(&["1"]));
@@ -14,9 +15,9 @@ fn create_list() -> Box<dyn Control> {
             item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().set_label(format!("clicked {}", i).into());
             let adapter = p.as_any_mut().downcast_mut::<imp::List>().unwrap().adapter_mut().as_any_mut().downcast_mut::<common::SimpleTextAdapter>().unwrap();
             if (i % 2) > 0 {
-               adapter.pop();
+                adapter.pop();
             } else {
-                adapter.push(format!("More clicked {} / pressed {}", adapter.len(), i.to_string())); 
+                adapter.push(format!("More clicked {} / pressed {}", adapter.len(), i.to_string()));
             }
         })
         .into(),
@@ -32,7 +33,7 @@ fn create_image(policy: ImageScalePolicy) -> Box<dyn Control> {
     i.into_control()
 }
 fn create_progress_bar(progress: Progress) -> Box<dyn Control> {
-	imp::ProgressBar::with_progress(progress).into_control()
+    imp::ProgressBar::with_progress(progress).into_control()
 }
 fn create_frame(name: &str, child: Box<dyn Control>) -> Box<dyn Control> {
     let mut frame = imp::Frame::with_label(name);
@@ -53,7 +54,7 @@ fn create_splitted(o: layout::Orientation, first: Box<dyn Control>, second: Box<
 fn create_button<'a, F, S>(name: &str, f: F, tag: Option<S>) -> Box<dyn Control>
 where
     F: FnMut(&mut dyn Clickable) + 'static,
-    S: Into<Cow<'a, str>>
+    S: Into<Cow<'a, str>>,
 {
     let mut button = imp::Button::with_label(name);
     button.on_click(Some(f.into()));
@@ -64,7 +65,7 @@ where
         })
         .into(),
     ));
-    button.set_tag(tag.map(|tag|tag.into()));
+    button.set_tag(tag.map(|tag| tag.into()));
     button.into_control()
 }
 
@@ -144,14 +145,14 @@ fn root() -> Box<dyn Control> {
 
             let parent = parent.is_multi_container_mut().unwrap();
             parent.child_at_mut(0).unwrap().set_visibility(Visibility::Visible);
-            
+
             if let Some(member) = parent.find_control_mut(By::Tag("tagg".into())) {
                 member.as_any_mut().downcast_mut::<imp::Button>().unwrap().click(false);
             }
         }
     };
     let mut s = create_splitted(
-    	layout::Orientation::Horizontal,
+        layout::Orientation::Horizontal,
         create_frame(
             "Frame #1",
             create_vertical_layout(vec![
@@ -174,19 +175,15 @@ fn root() -> Box<dyn Control> {
         ),
     );
     s.set_layout_width(layout::Size::MatchParent);
-	s.set_layout_height(layout::Size::MatchParent);
-	s
+    s.set_layout_height(layout::Size::MatchParent);
+    s
 }
 
 fn root2() -> Box<dyn Control> {
-	let mut s = create_splitted(
-		layout::Orientation::Horizontal, 
-		create_progress_bar(Progress::Value(35, 100)),
-		create_image(ImageScalePolicy::CropCenter), 
-	);
-	s.set_layout_width(layout::Size::MatchParent);
-	s.set_layout_height(layout::Size::MatchParent);
-	s
+    let mut s = create_splitted(layout::Orientation::Horizontal, create_progress_bar(Progress::Value(35, 100)), create_image(ImageScalePolicy::CropCenter));
+    s.set_layout_width(layout::Size::MatchParent);
+    s.set_layout_height(layout::Size::MatchParent);
+    s
 }
 
 pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>>) {
@@ -219,7 +216,7 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
                         "Close I said!".into(),
                         (|m: &mut dyn Member| {
                             println!("{:?} closed", m.id());
-    
+
                             false
                         })
                         .into(),
@@ -251,15 +248,20 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
                 (|m: &mut dyn Member| {
                     let application = m.as_any_mut().downcast_mut::<imp::Tray>().unwrap().application_mut();
                     application.prepare_exit();
-                    true                  
+                    true
                 })
                 .into(),
                 MenuItemRole::Help,
             ),
-            MenuItem::Action("No tray please".into(), (|m: &mut dyn Member| {
-                        let id = m.id();
-                        m.as_any_mut().downcast_mut::<imp::Tray>().unwrap().application_mut().close_root(FindBy::Id(id), true)
-                }).into(), MenuItemRole::Help),
+            MenuItem::Action(
+                "No tray please".into(),
+                (|m: &mut dyn Member| {
+                    let id = m.id();
+                    m.as_any_mut().downcast_mut::<imp::Tray>().unwrap().application_mut().close_root(FindBy::Id(id), true)
+                })
+                .into(),
+                MenuItemRole::Help,
+            ),
         ]),
     );
     let wi = application.new_window::<imp::Window>(
@@ -306,7 +308,7 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
             ),
         ]),
     );
-    
+
     {
         let wi = application.find_member_mut(FindBy::Id(wi)).unwrap().as_any_mut().downcast_mut::<imp::Window>().unwrap();
         wi.set_child(Some(root2()));
