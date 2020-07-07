@@ -7,7 +7,16 @@ use std::io::BufReader;
 use std::sync::{Arc, RwLock};
 
 fn create_tree() -> Box<dyn Control> {
-    let adapter = Box::new(common::SimpleTextAdapter::with_into_iterator(&["1","2","3"]));
+    let lvl22 = types::RecursiveTupleVec::with_value(String::from("22"), None);
+    let lvl21 = types::RecursiveTupleVec::with_value(String::from("21"), None);
+    let lvl20 = types::RecursiveTupleVec::with_value(String::from("20"), None);
+    
+    let lvl11 = types::RecursiveTupleVec::with_value(String::from("11"), Some(vec![lvl20, lvl21, lvl22]));
+    let lvl10 = types::RecursiveTupleVec::with_value(String::from("10"), None);
+    
+    let lvl00 = types::RecursiveTupleVec::with_value(String::from("00"), Some(vec![lvl10, lvl11]));
+    
+    let adapter = Box::new(common::SimpleTextTreeAdapter::from(vec![lvl00]));
     let mut list = imp::Tree::with_adapter(adapter);
     list.set_layout_height(layout::Size::MatchParent);
     list.on_item_click(Some(
