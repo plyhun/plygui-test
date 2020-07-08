@@ -26,7 +26,7 @@ fn create_tree() -> Box<dyn Control> {
             if (i % 2) > 0 {
                 adapter.pop();
             } else {
-                adapter.push(format!("More clicked {} / pressed {}", adapter.len(), i.to_string()));
+                adapter.push(format!("More clicked {} / pressed {}", adapter.len_at(&[]), i.to_string()));
             }
         })
         .into(),
@@ -45,7 +45,7 @@ fn create_list() -> Box<dyn Control> {
             if (i % 2) > 0 {
                 adapter.pop();
             } else {
-                adapter.push(format!("More clicked {} / pressed {}", adapter.len(), i.to_string()));
+                adapter.push(format!("More clicked {} / pressed {}", adapter.len_at(&[]), i.to_string()));
             }
         })
         .into(),
