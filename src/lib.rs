@@ -6,17 +6,67 @@ use std::fs::*;
 use std::io::BufReader;
 use std::sync::{Arc, RwLock};
 
+/*
 fn create_tree() -> Box<dyn Control> {
-    let lvl22 = types::RecursiveTupleVec::with_value(String::from("22"), None);
-    let lvl21 = types::RecursiveTupleVec::with_value(String::from("21"), None);
-    let lvl20 = types::RecursiveTupleVec::with_value(String::from("20"), None);
+    let level22 = types::RecursiveTupleVec::with_value("22", None);
+    let level21 = types::RecursiveTupleVec::with_value("21", None);
+    let level20 = types::RecursiveTupleVec::with_value("20", None);
+    let level10 = types::RecursiveTupleVec::with_value("10", Some(vec![level20, level21, level22]));
+    let mut level00 = types::RecursiveTupleVec::with_value("00", Some(vec![level10]));
     
-    let lvl11 = types::RecursiveTupleVec::with_value(String::from("11"), Some(vec![lvl20, lvl21, lvl22]));
-    let lvl10 = types::RecursiveTupleVec::with_value(String::from("10"), None);
+    println!("{:#?}", level00);
     
-    let lvl00 = types::RecursiveTupleVec::with_value(String::from("00"), Some(vec![lvl10, lvl11]));
+    if let Ok(inn) = level00.put(&[1], Some(types::RecursiveTupleVec::with_value("11", None))) {
+        if inn.is_some() { 
+            panic!("Some! {:#?}", level00); 
+        }
+    }
     
-    let adapter = Box::new(common::SimpleTextTreeAdapter::from(vec![lvl00]));
+    println!("{:#?}", level00);
+    
+    if let Ok(inn) = level00.put(&[0, 0], Some(types::RecursiveTupleVec::with_value("new 20", Some(vec![types::RecursiveTupleVec::with_value("30", None)])))) {
+        if inn.is_none() { 
+            panic!("None! {:#?}", level00); 
+        }
+    }
+    
+    println!("{:#?}", level00);
+    
+	let adapter = Box::new(common::SimpleTextAdapter::with_into_iterator(&["1", "11", "111", "1111"]));
+    let mut tree = imp::Tree::with_adapter(adapter);
+    tree.set_layout_height(layout::Size::MatchParent);
+    tree.into_control()
+}
+
+
+*/
+
+fn create_tree() -> Box<dyn Control> {
+    let level22 = types::RecursiveTupleVec::with_value(String::from("22"), None);
+    let level21 = types::RecursiveTupleVec::with_value(String::from("21"), None);
+    let level20 = types::RecursiveTupleVec::with_value(String::from("20"), None);
+    let level10 = types::RecursiveTupleVec::with_value(String::from("10"), Some(vec![level20, level21, level22]));
+    let mut level00 = types::RecursiveTupleVec::with_value(String::from("00"), Some(vec![level10]));
+    
+    println!("{:#?}", level00);
+    
+    if let Ok(inn) = level00.put(&[1], Some(types::RecursiveTupleVec::with_value(String::from("11"), None))) {
+        if inn.is_some() { 
+            panic!("Some! {:#?}", level00); 
+        }
+    }
+    
+    println!("{:#?}", level00);
+    
+    if let Ok(inn) = level00.put(&[0, 0], Some(types::RecursiveTupleVec::with_value(String::from("new 20"), Some(vec![types::RecursiveTupleVec::with_value(String::from("30"), None)])))) {
+        if inn.is_none() { 
+            panic!("None! {:#?}", level00); 
+        }
+    }
+    
+    println!("{:#?}", level00);
+    
+    let adapter = Box::new(common::SimpleTextTreeAdapter::from(vec![level00]));
     let mut list = imp::Tree::with_adapter(adapter);
     list.set_layout_height(layout::Size::MatchParent);
     list.on_item_click(Some(
