@@ -66,7 +66,7 @@ fn create_tree() -> Box<dyn Control> {
     
     println!("{:#?}", level00);
     
-    let adapter = Box::new(common::SimpleTextTreeAdapter::from(vec![level00]));
+    let adapter = Box::new(common::SimpleTextTreeAdapter::from(level00));
     let mut list = imp::Tree::with_adapter(adapter);
     list.set_layout_height(layout::Size::MatchParent);
     list.on_item_click(Some(
@@ -76,7 +76,7 @@ fn create_tree() -> Box<dyn Control> {
             if (i % 2) > 0 {
                 adapter.pop();
             } else {
-                adapter.push(format!("More clicked {} / pressed {}", adapter.len_at(&[]), i.to_string()));
+                adapter.push(format!("More clicked {} / pressed {}", adapter.len_at(&[]).unwrap(), i.to_string()));
             }
         })
         .into(),
@@ -95,7 +95,7 @@ fn create_list() -> Box<dyn Control> {
             if (i % 2) > 0 {
                 adapter.pop();
             } else {
-                adapter.push(format!("More clicked {} / pressed {}", adapter.len_at(&[]), i.to_string()));
+                adapter.push(format!("More clicked {} / pressed {}", adapter.len_at(&[]).unwrap(), i.to_string()));
             }
         })
         .into(),
