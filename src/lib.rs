@@ -66,7 +66,13 @@ fn create_tree() -> Box<dyn Control> {
     
     println!("{:#?}", level00);
     
-    let adapter = Box::new(common::SimpleTextTreeAdapter::from(level00));
+    let adapter = common::SimpleTextTreeAdapter::from(level00);
+    
+    adapter.for_each(&mut (|i, s| {
+        println!("{:?} {:?}", i, s);
+    }));
+    
+    let adapter = Box::new(adapter);
     let mut list = imp::Tree::with_adapter(adapter);
     list.set_layout_height(layout::Size::MatchParent);
     list.on_item_click(Some(
