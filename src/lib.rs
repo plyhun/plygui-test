@@ -76,13 +76,13 @@ fn create_tree() -> Box<dyn Control> {
     let mut list = imp::Tree::with_adapter(adapter);
     list.set_layout_height(layout::Size::MatchParent);
     list.on_item_click(Some(
-        (|p: &mut dyn ItemClickable, i: usize, item_view: &mut dyn Control| {
-            item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().set_label(format!("clicked {}", i).into());
+        (|p: &mut dyn ItemClickable, i: &[usize], item_view: &mut dyn Control| {
+            item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().set_label(format!("clicked {:?}", i).into());
             let adapter = p.as_any_mut().downcast_mut::<imp::List>().unwrap().adapter_mut().as_any_mut().downcast_mut::<common::SimpleTextAdapter>().unwrap();
-            if (i % 2) > 0 {
+            if (i[i.len()-1] % 2) > 0 {
                 adapter.pop();
             } else {
-                adapter.push(format!("More clicked {} / pressed {}", adapter.len_at(&[]).unwrap(), i.to_string()));
+                adapter.push(format!("More clicked {} / pressed {:?}", adapter.len_at(&[]).unwrap(), i));
             }
         })
         .into(),
@@ -95,13 +95,13 @@ fn create_list() -> Box<dyn Control> {
     let mut list = imp::List::with_adapter(adapter);
     list.set_layout_height(layout::Size::MatchParent);
     list.on_item_click(Some(
-        (|p: &mut dyn ItemClickable, i: usize, item_view: &mut dyn Control| {
-            item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().set_label(format!("clicked {}", i).into());
+        (|p: &mut dyn ItemClickable, i: &[usize], item_view: &mut dyn Control| {
+            item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().set_label(format!("clicked {}", i[0]).into());
             let adapter = p.as_any_mut().downcast_mut::<imp::List>().unwrap().adapter_mut().as_any_mut().downcast_mut::<common::SimpleTextAdapter>().unwrap();
-            if (i % 2) > 0 {
+            if (i[0] % 2) > 0 {
                 adapter.pop();
             } else {
-                adapter.push(format!("More clicked {} / pressed {}", adapter.len_at(&[]).unwrap(), i.to_string()));
+                adapter.push(format!("More clicked {} / pressed {}", adapter.len_at(&[]).unwrap(), i[0]));
             }
         })
         .into(),
