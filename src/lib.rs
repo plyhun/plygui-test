@@ -78,13 +78,13 @@ fn create_tree() -> Box<dyn Control> {
     list.on_item_click(Some(
         (|p: &mut dyn ItemClickable, i: &[usize], item_view: &mut dyn Control| {
             item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().set_label(format!("clicked {:?}", i).into());
-            let adapter = p.as_any_mut().downcast_mut::<imp::List>().unwrap().adapter_mut().as_any_mut().downcast_mut::<common::SimpleTextAdapter>().unwrap();
+/*            let adapter = p.as_any_mut().downcast_mut::<imp::Tree>().unwrap().adapter_mut().as_any_mut().downcast_mut::<common::SimpleTextAdapter>().unwrap();
             if (i[i.len()-1] % 2) > 0 {
                 adapter.pop();
             } else {
                 adapter.push(format!("More clicked {} / pressed {:?}", adapter.len_at(&[]).unwrap(), i));
             }
-        })
+  */      })
         .into(),
     ));
     list.into_control()
