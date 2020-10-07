@@ -50,7 +50,7 @@ fn create_tree() -> Box<dyn Control> {
     
     println!("{:#?}", level00);
     
-    if let Ok(inn) = level00.put(&[1], Some(types::RecursiveTupleVec::with_value(String::from("11"), None))) {
+    if let Ok(inn) = level00.put(&[1], VecItemChangeOption::Insert(types::RecursiveTupleVec::with_value(String::from("11"), None))) {
         if inn.is_some() { 
             panic!("Some! {:#?}", level00); 
         }
@@ -58,7 +58,7 @@ fn create_tree() -> Box<dyn Control> {
     
     println!("{:#?}", level00);
     
-    if let Ok(inn) = level00.put(&[0, 0], Some(types::RecursiveTupleVec::with_value(String::from("new 20"), Some(vec![types::RecursiveTupleVec::with_value(String::from("30"), None)])))) {
+    if let Ok(inn) = level00.put(&[0, 0], VecItemChangeOption::Replace(types::RecursiveTupleVec::with_value(String::from("new 20"), Some(vec![types::RecursiveTupleVec::with_value(String::from("30"), None)])))) {
         if inn.is_none() { 
             panic!("None! {:#?}", level00); 
         }
@@ -77,21 +77,43 @@ fn create_tree() -> Box<dyn Control> {
     list.set_layout_height(layout::Size::MatchParent);
     list.on_item_click(Some(
         (|p: &mut dyn ItemClickable, i: &[usize], item_view: &mut dyn Control| {
-            item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().set_label(format!("clicked {:?}", i).into());
-            if (i[i.len()-1] % 2) > 0 {
-                let _ = imp::Message::start_with_actions(
-                    TextContent::Plain("Even :)".into()),
-                    MessageSeverity::Info,
-                    vec![],
-                    Some(p.as_member())
-                );
-            } else {
-                let _ = imp::Message::start_with_actions(
-                    TextContent::Plain("Odd :(".into()),
-                    MessageSeverity::Info,
-                    vec![],
-                    Some(p.as_member())
-                );
+            item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().set_label(format!("Clicked {:?}", i).into());
+            if (i[i.len()-1] % 3) == 2 {
+            	let mut ii = Vec::from(i);
+            	ii.push(0);
+                match item_view
+	                .parent_mut().unwrap().as_any_mut().downcast_mut::<imp::Tree>().unwrap()
+	                .adapter_mut().as_any_mut().downcast_mut::<common::SimpleTextTreeAdapter>().unwrap()
+	                .put(i, VecItemChangeOption::Replace(types::RecursiveTupleVec::with_value(format!("Three {:?}", i), 
+		                Some(vec![])))) {
+	                	Ok(old) => { println!("Replaced {:?}", old) },
+	                	Err(e) => { println!("Error replacing {:?}: {:?}", i, e); }
+	                }
+		        match item_view
+	                .parent_mut().unwrap().as_any_mut().downcast_mut::<imp::Tree>().unwrap()
+	                .adapter_mut().as_any_mut().downcast_mut::<common::SimpleTextTreeAdapter>().unwrap()
+	                .put(ii.as_slice(), VecItemChangeOption::Insert(types::RecursiveTupleVec::with_value(format!("Created {:?}", ii.as_slice()), None))) {
+	                	Ok(old) => { println!("Inserted {:?}", old) },
+	                	Err(e) => { println!("Error inserting {:?}: {:?}", ii.as_slice(), e); }
+	                }
+            } else if (i[i.len()-1] % 2) == 1 {
+            	match item_view
+	                .parent_mut().unwrap().as_any_mut().downcast_mut::<imp::Tree>().unwrap()
+	                .adapter_mut().as_any_mut().downcast_mut::<common::SimpleTextTreeAdapter>().unwrap()
+	                .put(i, VecItemChangeOption::Remove) {
+	                	Ok(old) => { println!("Removed {:?}", old) },
+	                	Err(e) => { println!("Error removing {:?}: {:?}", i, e); }
+	                }
+            } else {                
+	            let mut ii = Vec::from(i);
+            	ii.as_mut_slice()[i.len()-1] += 1;
+                match item_view
+	                .parent_mut().unwrap().as_any_mut().downcast_mut::<imp::Tree>().unwrap()
+	                .adapter_mut().as_any_mut().downcast_mut::<common::SimpleTextTreeAdapter>().unwrap()
+	                .put(ii.as_slice(), VecItemChangeOption::Insert(types::RecursiveTupleVec::with_value(format!("Two {:?}", ii.as_slice()), None))) {
+	                	Ok(old) => { println!("Insetred {:?}", old) },
+	                	Err(e) => { println!("Error inserting {:?}: {:?}", ii.as_slice(), e); }
+	                }
             }
         })
         .into(),
