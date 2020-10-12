@@ -6,41 +6,6 @@ use std::fs::*;
 use std::io::BufReader;
 use std::sync::{Arc, RwLock};
 
-/*
-fn create_tree() -> Box<dyn Control> {
-    let level22 = types::RecursiveTupleVec::with_value("22", None);
-    let level21 = types::RecursiveTupleVec::with_value("21", None);
-    let level20 = types::RecursiveTupleVec::with_value("20", None);
-    let level10 = types::RecursiveTupleVec::with_value("10", Some(vec![level20, level21, level22]));
-    let mut level00 = types::RecursiveTupleVec::with_value("00", Some(vec![level10]));
-    
-    println!("{:#?}", level00);
-    
-    if let Ok(inn) = level00.put(&[1], Some(types::RecursiveTupleVec::with_value("11", None))) {
-        if inn.is_some() { 
-            panic!("Some! {:#?}", level00); 
-        }
-    }
-    
-    println!("{:#?}", level00);
-    
-    if let Ok(inn) = level00.put(&[0, 0], Some(types::RecursiveTupleVec::with_value("new 20", Some(vec![types::RecursiveTupleVec::with_value("30", None)])))) {
-        if inn.is_none() { 
-            panic!("None! {:#?}", level00); 
-        }
-    }
-    
-    println!("{:#?}", level00);
-    
-	let adapter = Box::new(common::SimpleTextAdapter::with_into_iterator(&["1", "11", "111", "1111"]));
-    let mut tree = imp::Tree::with_adapter(adapter);
-    tree.set_layout_height(layout::Size::MatchParent);
-    tree.into_control()
-}
-
-
-*/
-
 fn create_tree() -> Box<dyn Control> {
     let level22 = types::RecursiveTupleVec::with_value(String::from("22"), None);
     let level21 = types::RecursiveTupleVec::with_value(String::from("21"), None);
