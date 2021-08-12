@@ -3,8 +3,10 @@ use plygui::*;
 
 use std::borrow::Cow;
 use std::fs::*;
-use std::io::BufReader;
+use std::io::{BufReader, Cursor};
 use std::sync::{Arc, RwLock};
+
+const IMAGE: &'static [u8] = include_bytes!("../resources/lulz.png");
 
 fn create_tree() -> Box<dyn Control> {
     let level22 = types::RecursiveTupleVec::with_value(String::from("22"), None);
@@ -106,7 +108,7 @@ fn create_list() -> Box<dyn Control> {
 }
 
 fn create_image(policy: ImageScalePolicy) -> Box<dyn Control> {
-    let img = external::image::load(BufReader::new(File::open("resources/lulz.png").unwrap()), external::image::ImageFormat::Png).unwrap();
+    let img = external::image::load(BufReader::new(Cursor::new(IMAGE)), external::image::ImageFormat::Png).unwrap();
     let mut i = imp::Image::with_content(img);
     i.set_scale(policy);
     i.set_layout_height(layout::Size::MatchParent);
