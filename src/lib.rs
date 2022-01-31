@@ -2,7 +2,6 @@
 use plygui::*;
 
 use std::borrow::Cow;
-use std::fs::*;
 use std::io::{BufReader, Cursor};
 use std::sync::{Arc, RwLock};
 
@@ -48,24 +47,21 @@ fn create_tree() -> Box<dyn Control> {
             if (i[i.len()-1] % 3) == 2 {
             	let mut ii = Vec::from(i);
             	ii.push(0);
-                match item_view
-	                .parent_mut().unwrap().as_any_mut().downcast_mut::<imp::Tree>().unwrap()
+                match p.as_any_mut().downcast_mut::<imp::Tree>().unwrap()
 	                .adapter_mut().as_any_mut().downcast_mut::<common::SimpleTextTreeAdapter>().unwrap()
 	                .put(i, VecItemChangeOption::Replace(types::RecursiveTupleVec::with_value(format!("Three {:?}", i), 
 		                Some(vec![])))) {
 	                	Ok(old) => { println!("Replaced {:?}", old) },
 	                	Err(e) => { println!("Error replacing {:?}: {:?}", i, e); }
 	                }
-		        match item_view
-	                .parent_mut().unwrap().as_any_mut().downcast_mut::<imp::Tree>().unwrap()
+		        match p.as_any_mut().downcast_mut::<imp::Tree>().unwrap()
 	                .adapter_mut().as_any_mut().downcast_mut::<common::SimpleTextTreeAdapter>().unwrap()
 	                .put(ii.as_slice(), VecItemChangeOption::Insert(types::RecursiveTupleVec::with_value(format!("Created {:?}", ii.as_slice()), None))) {
 	                	Ok(old) => { println!("Inserted {:?}", old) },
 	                	Err(e) => { println!("Error inserting {:?}: {:?}", ii.as_slice(), e); }
 	                }
             } else if (i[i.len()-1] % 2) == 1 {
-            	match item_view
-	                .parent_mut().unwrap().as_any_mut().downcast_mut::<imp::Tree>().unwrap()
+            	match p.as_any_mut().downcast_mut::<imp::Tree>().unwrap()
 	                .adapter_mut().as_any_mut().downcast_mut::<common::SimpleTextTreeAdapter>().unwrap()
 	                .put(i, VecItemChangeOption::Remove) {
 	                	Ok(old) => { println!("Removed {:?}", old) },
@@ -74,8 +70,7 @@ fn create_tree() -> Box<dyn Control> {
             } else {                
 	            let mut ii = Vec::from(i);
             	ii.as_mut_slice()[i.len()-1] += 1;
-                match item_view
-	                .parent_mut().unwrap().as_any_mut().downcast_mut::<imp::Tree>().unwrap()
+                match p.as_any_mut().downcast_mut::<imp::Tree>().unwrap()
 	                .adapter_mut().as_any_mut().downcast_mut::<common::SimpleTextTreeAdapter>().unwrap()
 	                .put(ii.as_slice(), VecItemChangeOption::Insert(types::RecursiveTupleVec::with_value(format!("Two {:?}", ii.as_slice()), None))) {
 	                	Ok(old) => { println!("Insetred {:?}", old) },
