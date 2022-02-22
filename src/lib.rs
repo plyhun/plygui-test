@@ -7,6 +7,18 @@ use std::sync::{Arc, RwLock};
 
 const IMAGE: &'static [u8] = include_bytes!("../resources/lulz.png");
 
+fn create_table(width: usize, height: usize) -> Box<dyn Control> {
+    let mut adapter = Box::new(common::SimpleTextTableAdapter::with_dimensions(width, height));
+    adapter.set_text_at(Some("0,0"), 0, 0);
+    adapter.set_text_at(Some("1,1"), 1, 1);
+    adapter.set_text_at(Some("2,2"), 2, 2);
+    adapter.set_text_at(Some("3,2"), 3, 2);
+
+    let mut table = imp::Table::with_adapter_initial_size(adapter, width, height);
+    table.set_layout_height(layout::Size::MatchParent);
+    table.into_control()
+}
+
 fn create_tree() -> Box<dyn Control> {
     let level22 = types::RecursiveTupleVec::with_value(String::from("22"), None);
     let level21 = types::RecursiveTupleVec::with_value(String::from("21"), None);
@@ -224,8 +236,8 @@ fn root() -> Box<dyn Control> {
                 create_button("Button #1", button_click, Some("tagg")),
                 create_button("Button #2", click_2, Option::<String>::None),
                 create_text("I am text"),
-                //create_table(),
-                create_tree(),
+                create_table(5, 5),
+                //create_tree(),
                 //create_image(ImageScalePolicy::FitCenter),
             ]),
         ),
