@@ -14,36 +14,24 @@ fn create_tree() -> Box<dyn Control> {
     let level10 = types::RecursiveTupleVec::with_value(String::from("10"), Some(vec![level20, level21, level22]));
     let mut level00 = types::RecursiveTupleVec::with_value(String::from("00"), Some(vec![level10]));
     
-    println!("{:#?}", level00);
-    
     if let Ok(inn) = level00.put(&[1], VecItemChangeOption::Insert(types::RecursiveTupleVec::with_value(String::from("11"), None))) {
         if inn.is_some() { 
             panic!("Some! {:#?}", level00); 
         }
     }
-    
-    println!("{:#?}", level00);
-    
     if let Ok(inn) = level00.put(&[0, 0], VecItemChangeOption::Replace(types::RecursiveTupleVec::with_value(String::from("new 20"), Some(vec![types::RecursiveTupleVec::with_value(String::from("30"), None)])))) {
         if inn.is_none() { 
             panic!("None! {:#?}", level00); 
         }
     }
-    
-    println!("{:#?}", level00);
-    
     let adapter = common::SimpleTextTreeAdapter::from(level00);
-    
-    adapter.for_each(&mut (|i, s| {
-        println!("{:?} {:?}", i, s);
-    }));
     
     let adapter = Box::new(adapter);
     let mut list = imp::Tree::with_adapter(adapter);
     list.set_layout_height(layout::Size::MatchParent);
     list.on_item_click(Some(
         (|p: &mut dyn ItemClickable, i: &[usize], item_view: &mut dyn Control| {
-            item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().set_label(format!("Clicked {:?}", i).into());
+            item_view.as_member_mut().is_has_label_mut().unwrap().set_label(format!("Clicked {:?}", i).into());
             if (i[i.len()-1] % 3) == 2 {
             	let mut ii = Vec::from(i);
             	ii.push(0);
