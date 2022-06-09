@@ -14,7 +14,7 @@ fn create_table(width: usize, height: usize) -> Box<dyn Control> {
     adapter.set_text_at(Some("2,2"), 2, 2);
     adapter.set_text_at(Some("3,2"), 3, 2);
 
-    let mut table = imp::Table::with_adapter_initial_size(adapter, width, height);
+    let mut table = imp::Table::with_adapter(adapter);
     table.set_layout_height(layout::Size::MatchParent);
     table.into_control()
 }
@@ -236,7 +236,7 @@ fn root() -> Box<dyn Control> {
                 create_button("Button #1", button_click, Some("tagg")),
                 create_button("Button #2", click_2, Option::<String>::None),
                 create_text("I am text"),
-                create_table(5, 5),
+                create_table(4, 4),
                 //create_tree(),
                 //create_image(ImageScalePolicy::FitCenter),
             ]),
