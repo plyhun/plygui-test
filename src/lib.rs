@@ -7,8 +7,14 @@ use std::sync::{Arc, RwLock};
 
 const IMAGE: &'static [u8] = include_bytes!("../resources/lulz.png");
 
-fn create_table(width: usize, height: usize) -> Box<dyn Control> {
+fn create_table(width: usize, height: usize, with_headers: bool) -> Box<dyn Control> {
     let mut adapter = Box::new(common::SimpleTextTableAdapter::with_dimensions(width, height));
+    if with_headers {
+        adapter.set_column_label_at(Some("0"), 0);
+        adapter.set_column_label_at(Some("1"), 1);
+        adapter.set_column_label_at(Some("2"), 2);
+        adapter.set_column_label_at(Some("3"), 3);
+    }
     adapter.set_text_at(Some("0,0"), 0, 0);
     adapter.set_text_at(Some("1,1"), 1, 1);
     adapter.set_text_at(Some("2,2"), 2, 2);
@@ -236,7 +242,7 @@ fn root() -> Box<dyn Control> {
                 create_button("Button #1", button_click, Some("tagg")),
                 create_button("Button #2", click_2, Option::<String>::None),
                 create_text("I am text"),
-                create_table(4, 4),
+                create_table(4, 4, true),
                 //create_tree(),
                 //create_image(ImageScalePolicy::FitCenter),
             ]),
