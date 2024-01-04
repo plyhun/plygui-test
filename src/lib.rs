@@ -10,18 +10,21 @@ const IMAGE: &'static [u8] = include_bytes!("../resources/lulz.png");
 fn create_table(width: usize, height: usize, with_headers: bool) -> Box<dyn Control> {
     let mut adapter = Box::new(common::SimpleTextTableAdapter::with_dimensions(width, height));
     if with_headers {
-        adapter.set_column_label_at(Some("0"), 0);
-        adapter.set_column_label_at(Some("1"), 1);
-        adapter.set_column_label_at(Some("2"), 2);
-        adapter.set_column_label_at(Some("3"), 3);
+        adapter.set_column_label_at(Some("Head #0"), 0);
+        adapter.set_column_label_at(Some("Head #1"), 1);
+        adapter.set_column_label_at(Some("Head #2"), 2);
+        adapter.set_column_label_at(Some("Head #3"), 3);
     }
-    adapter.set_text_at(Some("0,0"), 0, 0);
-    adapter.set_text_at(Some("1,1"), 1, 1);
-    adapter.set_text_at(Some("2,2"), 2, 2);
-    adapter.set_text_at(Some("3,2"), 3, 2);
+    adapter.set_text_at(Some("Item #0,0"), 0, 0);
+    adapter.set_text_at(Some("Item #1,1"), 1, 1);
+    adapter.set_text_at(Some("Item #2,2"), 2, 2);
+    adapter.set_text_at(Some("Item #3,2"), 3, 2);
+    adapter.set_text_at(Some("Item #0,3"), 0, 3);
+    adapter.set_text_at(Some("Item #1,3"), 1, 3);
 
     let mut table = imp::Table::with_adapter(adapter);
     table.set_layout_height(layout::Size::MatchParent);
+    table.set_headers_visible(with_headers);
     table.into_control()
 }
 
@@ -253,8 +256,10 @@ fn root() -> Box<dyn Control> {
                 create_button("Button #1", button_click, Option::<String>::None),
                 create_button("Button #2", click_2, Option::<String>::None),
                 create_text("I'm a text too"),
+                //create_table(4, 4, false),
                 create_list(),
                 //create_image(),
+                //create_tree(),
             ]),
         ),
     );
@@ -396,6 +401,10 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
     {
         let wi = application.find_member_mut(FindBy::Id(wi)).unwrap().as_any_mut().downcast_mut::<imp::Window>().unwrap();
         wi.set_child(Some(root2()));
+    }
+    {
+   //     let wi2 = application.new_window::<imp::Window>("Table window %)", WindowStartSize::Exact(400, 400), None);
+   //     application.find_member_mut(FindBy::Id(wi2)).unwrap().as_any_mut().downcast_mut::<imp::Window>().unwrap().set_child(create_table(4, 4, true).into());
     }
 
     application.start();
