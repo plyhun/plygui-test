@@ -25,6 +25,9 @@ fn create_table(width: usize, height: usize, with_headers: bool) -> Box<dyn Cont
     let mut table = imp::Table::with_adapter(adapter);
     table.set_layout_height(layout::Size::MatchParent);
     table.set_headers_visible(with_headers);
+    table.on_item_click(Some((|p: &mut dyn ItemClickable, i: &[usize], item_view: &mut dyn Control| {
+        dbg!(item_view.as_member_mut().is_has_label_mut().unwrap().label());
+    }).into()));
     table.into_control()
 }
 
