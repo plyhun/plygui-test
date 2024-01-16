@@ -26,7 +26,76 @@ fn create_table(width: usize, height: usize, with_headers: bool) -> Box<dyn Cont
     table.set_layout_height(layout::Size::MatchParent);
     table.set_headers_visible(with_headers);
     table.on_item_click(Some((|p: &mut dyn ItemClickable, i: &[usize], item_view: &mut dyn Control| {
-        dbg!(item_view.as_member_mut().is_has_label_mut().unwrap().label());
+        if i.len() < 2 {
+            item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().set_label(format!("clicked {}", i[0]).into());
+        } else {
+            item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().set_label(format!("clicked [{},{}]", i[0], i[1]).into());
+            let adapter = p.as_any_mut().downcast_mut::<imp::Table>().unwrap().adapter_mut().as_any_mut().downcast_mut::<common::SimpleTextTableAdapter>().unwrap();
+            let (w, h) = adapter.dimensions();
+            let mut empty = true;
+
+            // Left
+            if i[0] > 0 {
+                if adapter.text_at(i[0]-1, i[1]).is_none() {
+                    adapter.set_text_at(Some(format!("Item #{},{}", i[0]-1, i[1])), i[0]-1, i[1]);
+                } else {
+                    adapter.set_text_at::<String>(None, i[0]-1, i[1]);
+                    empty = false;
+                }
+            } else {
+                dbg!("Missing left {}", i[0]);
+            }
+            // Right
+            if i[0] < (w-1) {
+                if adapter.text_at(i[0]+1, i[1]).is_some() {
+                    adapter.set_text_at::<String>(None, i[0]+1, i[1]);
+                    empty = false;
+                } else {
+                    adapter.set_text_at(Some(format!("Item #{},{}", i[0]+1, i[1])), i[0]+1, i[1]);
+                }
+            } else {
+                dbg!("Missing right {}", i[0]);
+            }
+            // Up
+            if i[1] > 0 {
+                if adapter.text_at(i[0], i[1]-1).is_none() {
+                    adapter.set_text_at(Some(format!("Item #{},{}", i[0], i[1]-1)), i[0], i[1]-1);
+                } else {
+                    adapter.set_text_at::<String>(None, i[0], i[1]-1);
+                    empty = false;
+                }
+            } else {
+                dbg!("Missing up {}", i[1]);
+            }
+            // Down
+            if i[1] < (h-1) {
+                if adapter.text_at(i[0], i[1]+1).is_some() {
+                    adapter.set_text_at::<String>(None, i[0], i[1]+1);
+                    empty = false;
+                } else {
+                    adapter.set_text_at(Some(format!("Item #{},{}", i[0], i[1]+1)), i[0], i[1]+1);
+                }
+            } else {
+                dbg!("Missing down {}", i[1]);
+            }
+            if empty {
+                let _ = imp::Message::start_with_actions(
+                    TextContent::Plain("Trapped".into()),
+                    MessageSeverity::Info,
+                    vec![
+                        (
+                            "Damn".into(),
+                            (|m: &mut dyn Member| {
+                                println!("{:?} trapped", m.id());
+                                false
+                            })
+                            .into(),
+                        ),
+                    ],
+                    Some(p.as_member()),
+                );
+            }
+        }
     }).into()));
     table.into_control()
 }
