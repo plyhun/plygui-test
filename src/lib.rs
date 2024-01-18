@@ -27,8 +27,10 @@ fn create_table(width: usize, height: usize, with_headers: bool) -> Box<dyn Cont
     table.set_headers_visible(with_headers);
     table.on_item_click(Some((|p: &mut dyn ItemClickable, i: &[usize], item_view: &mut dyn Control| {
         if i.len() < 2 {
+            dbg!("clicked header", i, item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().label());
             item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().set_label(format!("clicked {}", i[0]).into());
         } else {
+            dbg!("clicked cell", i, item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().label());
             item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().set_label(format!("clicked [{},{}]", i[0], i[1]).into());
             let adapter = p.as_any_mut().downcast_mut::<imp::Table>().unwrap().adapter_mut().as_any_mut().downcast_mut::<common::SimpleTextTableAdapter>().unwrap();
             let (w, h) = adapter.dimensions();
