@@ -26,16 +26,25 @@ fn create_table(width: usize, height: usize, with_headers: bool) -> Box<dyn Cont
     table.set_layout_height(layout::Size::MatchParent);
     table.set_headers_visible(with_headers);
     table.on_item_click(Some((|p: &mut dyn ItemClickable, i: &[usize], item_view: &mut dyn Control| {
+        let adapter = p.as_any_mut().downcast_mut::<imp::Table>().unwrap().adapter_mut().as_any_mut().downcast_mut::<common::SimpleTextTableAdapter>().unwrap();
+        let (w, h) = adapter.dimensions();
         if i.len() < 2 {
             dbg!("clicked header", i, item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().label());
             item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().set_label(format!("clicked {}", i[0]).into());
+            match i[0] % 2 {
+                0 => {
+                    adapter.set_dimensions(w+1, h);
+                    adapter.set_column_label_at(Some(format!("Head #{}", w)), w);
+                },
+                1 => {
+                    adapter.set_dimensions(w-1, h);
+                },
+                _ => panic!("Unreacheable")
+            }
         } else {
             dbg!("clicked cell", i, item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().label());
             item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().set_label(format!("clicked [{},{}]", i[0], i[1]).into());
-            let adapter = p.as_any_mut().downcast_mut::<imp::Table>().unwrap().adapter_mut().as_any_mut().downcast_mut::<common::SimpleTextTableAdapter>().unwrap();
-            let (w, h) = adapter.dimensions();
             let mut empty = true;
-
             // Left
             if i[0] > 0 {
                 if adapter.text_at(i[0]-1, i[1]).is_none() {
