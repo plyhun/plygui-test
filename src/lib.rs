@@ -21,6 +21,7 @@ fn create_table(width: usize, height: usize, with_headers: bool) -> Box<dyn Cont
     adapter.set_text_at(Some("Item #3,2"), 3, 2);
     adapter.set_text_at(Some("Item #0,3"), 0, 3);
     adapter.set_text_at(Some("Item #1,3"), 1, 3);
+    adapter.set_text_at(Some("Item #4,3"), 4, 3);
 
     let mut table = imp::Table::with_adapter(adapter);
     table.set_layout_height(layout::Size::MatchParent);
@@ -45,7 +46,7 @@ fn create_table(width: usize, height: usize, with_headers: bool) -> Box<dyn Cont
             dbg!("clicked cell", i, item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().label());
             item_view.as_any_mut().downcast_mut::<imp::Text>().unwrap().set_label(format!("clicked [{},{}]", i[0], i[1]).into());
             let mut empty = true;
-            // Left
+            // Down
             if i[0] > 0 {
                 if adapter.text_at(i[0]-1, i[1]).is_none() {
                     adapter.set_text_at(Some(format!("Item #{},{}", i[0]-1, i[1])), i[0]-1, i[1]);
@@ -54,10 +55,10 @@ fn create_table(width: usize, height: usize, with_headers: bool) -> Box<dyn Cont
                     empty = false;
                 }
             } else {
-                dbg!("Missing left {}", i[0]);
+                println!("Missing down {}", i[0]);
             }
-            // Right
-            if i[0] < (w-1) {
+            // Up
+            if i[0] < (h-1) {
                 if adapter.text_at(i[0]+1, i[1]).is_some() {
                     adapter.set_text_at::<String>(None, i[0]+1, i[1]);
                     empty = false;
@@ -65,9 +66,9 @@ fn create_table(width: usize, height: usize, with_headers: bool) -> Box<dyn Cont
                     adapter.set_text_at(Some(format!("Item #{},{}", i[0]+1, i[1])), i[0]+1, i[1]);
                 }
             } else {
-                dbg!("Missing right {}", i[0]);
+                println!("Missing up {}", i[0]);
             }
-            // Up
+            // Roght
             if i[1] > 0 {
                 if adapter.text_at(i[0], i[1]-1).is_none() {
                     adapter.set_text_at(Some(format!("Item #{},{}", i[0], i[1]-1)), i[0], i[1]-1);
@@ -76,10 +77,10 @@ fn create_table(width: usize, height: usize, with_headers: bool) -> Box<dyn Cont
                     empty = false;
                 }
             } else {
-                dbg!("Missing up {}", i[1]);
+                println!("Missing right {}", i[1]);
             }
-            // Down
-            if i[1] < (h-1) {
+            // Left
+            if i[1] < (w-1) {
                 if adapter.text_at(i[0], i[1]+1).is_some() {
                     adapter.set_text_at::<String>(None, i[0], i[1]+1);
                     empty = false;
@@ -87,7 +88,7 @@ fn create_table(width: usize, height: usize, with_headers: bool) -> Box<dyn Cont
                     adapter.set_text_at(Some(format!("Item #{},{}", i[0], i[1]+1)), i[0], i[1]+1);
                 }
             } else {
-                dbg!("Missing down {}", i[1]);
+                println!("Missing left {}", i[1]);
             }
             if empty {
                 let _ = imp::Message::start_with_actions(
@@ -328,7 +329,7 @@ fn root() -> Box<dyn Control> {
                 create_button("Button #1", button_click, Some("tagg")),
                 create_button("Button #2", click_2, Option::<String>::None),
                 create_text("I am text"),
-                create_table(4, 4, true),
+                create_table(4, 5, true),
                 //create_tree(),
                 //create_image(ImageScalePolicy::FitCenter),
             ]),
@@ -339,7 +340,7 @@ fn root() -> Box<dyn Control> {
                 create_button("Button #1", button_click, Option::<String>::None),
                 create_button("Button #2", click_2, Option::<String>::None),
                 create_text("I'm a text too"),
-                //create_table(4, 4, false),
+                //create_table(4, 5, false),
                 create_list(),
                 //create_image(),
                 //create_tree(),
