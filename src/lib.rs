@@ -329,8 +329,8 @@ fn root() -> Box<dyn Control> {
                 create_button("Button #1", button_click, Some("tagg")),
                 create_button("Button #2", click_2, Option::<String>::None),
                 create_text("I am text"),
-                create_table(4, 5, true),
-                //create_tree(),
+                //create_table(4, 5, true),
+                create_tree(),
                 //create_image(ImageScalePolicy::FitCenter),
             ]),
         ),
@@ -487,8 +487,8 @@ pub fn exec(feeders: Arc<RwLock<Vec<callbacks::AsyncFeeder<callbacks::OnFrame>>>
         wi.set_child(Some(root2()));
     }
     {
-   //     let wi2 = application.new_window::<imp::Window>("Table window %)", WindowStartSize::Exact(400, 400), None);
-   //     application.find_member_mut(FindBy::Id(wi2)).unwrap().as_any_mut().downcast_mut::<imp::Window>().unwrap().set_child(create_table(4, 4, true).into());
+        let wi2 = application.new_window::<imp::Window>("Table window %)", WindowStartSize::Exact(400, 400), None);
+        application.find_member_mut(FindBy::Id(wi2)).unwrap().as_any_mut().downcast_mut::<imp::Window>().unwrap().set_child(create_table(4, 5, true).into());
     }
 
     application.start();
